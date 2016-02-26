@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3/d3.v3.js"></script>
+        <script type="text/javascript" src="https://d3js.org/d3-queue.v2.min.js"></script>
+        <style>
+        div.bar {
+            display: inline-block;
+            width: 20px;
+            height: 75px;   /* We'll override this later */
+            background-color: teal;
+            margin-right: 2px;
+        }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            d3.csv("data/pulse_output.txt", function(data) {
+                var dataset = []
+
+                data.forEach(function(object) {
+                    dataset.push(parseFloat(object.probability))
+                })
+
+                d3.select("body").selectAll("div")
+                    .data(dataset)
+                    .enter()
+                    .append("div")
+                    .attr("class", "bar")
+                    .style("height", function(d) {
+                        var barHeight = d * 100;
+                        return barHeight + "px";
+                    })
+                console.log(dataset)
+            })
+
+        </script>
+    </body>
+</html>     
