@@ -6,36 +6,38 @@
         <script type="text/javascript" src="d3/d3.v3.js"></script>
         <script type="text/javascript" src="https://d3js.org/d3-queue.v2.min.js"></script>
         <style>
-        div.bar {
-            display: inline-block;
-            width: 20px;
-            height: 75px;   /* We'll override this later */
-            background-color: teal;
-            margin-right: 2px;
-        }
         </style>
     </head>
     <body>
         <script type="text/javascript">
             d3.csv("data/pulse_output.txt", function(data) {
+
+                var w = 600
+                var h = 200
+
                 var dataset = []
+                svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h)
 
                 data.forEach(function(object) {
                     dataset.push(parseFloat(object.probability))
                 })
 
-                d3.select("body").selectAll("div")
+                svg.selectAll("rect")
                     .data(dataset)
                     .enter()
-                    .append("div")
-                    .attr("class", "bar")
-                    .style("height", function(d) {
-                        var barHeight = d * 100;
-                        return barHeight + "px";
-                    })
+                    .append("rect")
+                    .attr("x", (d, i) => (i * (w / dataset.length)))
+                    .attr("y", (d) => h - (d * 100))
+                    .attr("width", w / dataset.length)
+                    .attr("height", (d) =>  d * 100)
+                    .attr("fill", (d) => "rgb(0, 0," + (d * 100) + ")");
+
                 console.log(dataset)
             })
 
         </script>
     </body>
-</html>     
+</html>    
