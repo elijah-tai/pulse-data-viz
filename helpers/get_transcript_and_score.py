@@ -53,11 +53,14 @@ if __name__ == "__main__":
     score_list = get_scores('data/pulse_output.txt')
 
     # Combine two lists
-    protein_to_score = zip(protein_list, score_list)
-    transcripts_to_score = zip(transcript_list, score_list)
+    index_list = ["index"] + [i for i in range(0, len(protein_list) - 1)]
+    protein_to_score = zip(index_list, protein_list, score_list)
+    transcripts_to_score = zip(index_list, transcript_list, score_list)
 
     # Write to file in data/
     with open('data/protein_to_score.txt', 'w') as f:
         # Change this between protein_to_score || transcript_to_score
+        count = 0
         for pair in protein_to_score:
-            f.write("{},{}\n".format(pair[0], pair[1]))
+            f.write("{},{},{}\n".format(pair[0], pair[1], pair[2]))
+            count = count + 1
