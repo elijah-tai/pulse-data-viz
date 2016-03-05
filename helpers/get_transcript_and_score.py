@@ -53,14 +53,20 @@ if __name__ == "__main__":
     score_list = get_scores('data/pulse_output.txt')
 
     # Combine two lists
-    index_list = ["index"] + [i for i in range(0, len(protein_list) - 1)]
-    protein_to_score = zip(index_list, protein_list, score_list)
-    transcripts_to_score = zip(index_list, transcript_list, score_list)
+    # index_list = [i for i in range(0, len(protein_list) - 1)]
+    protein_to_score = zip(protein_list, score_list)
+    transcripts_to_score = zip(transcript_list, score_list)
+
+    # Sort by probability
+    protein_to_score_sorted_by_score = sorted(protein_to_score, key=lambda x: x[1])
 
     # Write to file in data/
     with open('data/protein_to_score.txt', 'w') as f:
         # Change this between protein_to_score || transcript_to_score
-        count = 0
-        for pair in protein_to_score:
-            f.write("{},{},{}\n".format(pair[0], pair[1], pair[2]))
+        count = 1
+        f.write("index,protein,probability\n")
+        for triplet in protein_to_score_sorted_by_score:
+            f.write("{},{},{}\n".format(count, triplet[0], triplet[1]))
             count = count + 1
+
+
