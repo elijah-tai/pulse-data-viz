@@ -57,10 +57,10 @@ d3.csv("data/protein_to_score.txt", function(data) {
                 yCat + ": " + d[yCat]
               )
 
-  var zoomBeh = d3.behaviour.zoom()
+  var zoomBeh = d3.behavior.zoom()
         .x(xScale)
         .y(yScale)
-        .scaleExtend([0, 500])
+        .scaleExtent([0, 500])
         .on("zoom", zoom)
 
   // Build svg
