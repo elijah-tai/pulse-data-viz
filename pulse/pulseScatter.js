@@ -41,20 +41,18 @@ d3.csv("data/protein_to_score.txt", function(data) {
   var xAxis = d3.svg.axis()
                     .scale(xScale)
                     .orient("bottom")
-                    .ticks(-height)
 
   var yAxis = d3.svg.axis()
                     .scale(yScale)
                     .orient("left")
-                    .ticks(-width)
 
   // Initialize tooltip
   var tip = d3.tip()
               .attr("class", "d3-tip")
               .offset([-10, 0])
               .html(
-                d => xCat + ": " + d[xCat] + "<br>" + 
-                yCat + ": " + d[yCat]
+                d => "protein: " + d["protein"] + "<br>" 
+                + yCat + ": " + d[yCat]
               )
 
   var zoomBeh = d3.behavior.zoom()
@@ -128,7 +126,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .data(data)
     .enter().append("circle")
       .classed("dot", true)
-      .attr("r", 0.75)
+      .attr("r", 5)
       .attr("transform", transform)
       .on("mouseover", tip.show)
       .on("mouseout", tip.hide)
@@ -158,7 +156,6 @@ d3.csv("data/protein_to_score.txt", function(data) {
   }
 
   function transform(d) {
-    console.log(xScale(d[xCat]), yScale(d[yCat]))
     return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
   }
 })
