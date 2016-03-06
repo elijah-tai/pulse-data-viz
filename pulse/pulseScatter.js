@@ -15,6 +15,9 @@ var yScale = d3.scale.linear()
 var xCat = "index",
     yCat = "probability"
 
+const xLabel = "protein number",
+      yLabel = "probability"
+
 d3.csv("data/protein_to_score.txt", function(data) {
   // Build data array
   data.forEach(function(d) {
@@ -87,7 +90,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .attr("text-anchor", "end")
       .attr("x", width)
       .attr("y", margin.bottom - 10)
-      .text(xCat)
+      .text(xLabel)
 
   // Attach y axis and label
   svg.append("g")
@@ -143,7 +146,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
 
     var svg = d3.select("#scatter").transition()
 
-    svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xCat)
+    svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xLabel)
     objects.selectAll(".dot").transition().duration(1000).attr("transform", transform)
   }
 
