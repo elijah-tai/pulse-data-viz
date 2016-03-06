@@ -1,85 +1,164 @@
+'use strict'
+
+const margin = { top: 50, right: 300, bottom: 50, left: 50},
+    outerWidth = 1050,
+    outerHeight = 500,
+    width = outerWidth - margin.left - margin.right,
+    height = outerHeight - margin.top - margin.bottom
+
+var xScale = d3.scale.linear()
+                     .range([0, width]).nice()
+
+var yScale = d3.scale.linear()
+                     .range([height, 0])
+
+var xCat = "index",
+    yCat = "probability"
+
 d3.csv("data/protein_to_score.txt", function(data) {
-  var w = 1000
-  var h = 300
-
-  var dataset = []
-  var padding = 30
-
-  var svg = d3.select("body")
-          .append("svg")
-          .attr("width", w)
-          .attr("height", h)
-
-  data.forEach(function(object) {
-      dataset.push([parseInt(object.index), object.protein, parseFloat(object.probability)])
+  // Build data array
+  data.forEach(function(d) {
+      d.index = +d.index
+      d.protein = d.protein
+      d.probability = +d.probability
   })
 
-  var xScale = d3.scale.linear()
-                       .domain([0, d3.max(dataset, d => d[0])])
-                       .range([padding, w - padding])
+  // Calculate ranges
+  var xMax = d3.max(data, d => d[xCat]) * 1.05,
+      xMin = d3.min(data, d => d[xCat]),
+      // If xMin > 0, set xMin = 0, else xMin
+      xMin = xMin > 0 ? 0 : xMin,
+      yMax = d3.max(data, d => d[yCat]) * 1.05,
+      // If yMax < 1, set yMax = 1, else, yMax
+      yMax = yMax < 1 ? 1 : yMax,
+      yMin = d3.min(data, d => d[yCat]),
+      yMin = yMin > 0 ? 0 : yMin
 
-  var yScale = d3.scale.linear()
-                       .domain([0, 1])
-                       .range([h - padding, padding])
+  xScale.domain([xMin, xMax])
+  yScale.domain([yMin, yMax])
 
+  // Build axis
   var xAxis = d3.svg.axis()
                     .scale(xScale)
                     .orient("bottom")
-                    .ticks(10)
+                    .ticks(-height)
 
   var yAxis = d3.svg.axis()
                     .scale(yScale)
                     .orient("left")
-                    .ticks(5)
+                    .ticks(-width)
 
-  console.log(dataset[2][1])
+  // Initialize tooltip
+  var tip = d3.tip()
+              .attr("class", "d3-tip")
+              .offset([-10, 0])
+              .html(
+                d => xCat + ": " + d[xCat] + "<br>" + 
+                yCat + ": " + d[yCat]
+              )
 
-  var circles = svg.selectAll("circle")
-      .data(dataset)
-      .enter()
-      .append("circle")
-      .attr("cx", d => xScale(d[0]))
-      .attr("cy", d => yScale(d[2]))
-      .attr("r", 0.75)
+  var zoomBeh = d3.behaviour.zoom()
+        .x(xScale)
+        .y(yScale)
+        .scaleExtend([0, 500])
+        .on("zoom", zoom)
 
-  showName = function(dataset, index) {
-      return dataset[index];
-  }
+  // Build svg
+  var svg = d3.select("#scatter")
+      .append("svg")
+        .attr("width", outerWidth)
+        .attr("height", outerHeight)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoomBeh)
 
-  // svg.selectAll("text")
-  //    .data(dataset)
-  //    .enter()
-  //    .append("text")
-  //    .text(d => d[1])
-  //    .attr("x", d => xScale(d[0]))
-  //    .attr("y", d => yScale(d[2]))
-  //    .attr("font-family", "sans-serif")
-  //    .attr("font-size", "11px")
-  //    .attr("fill", "red")
+  svg.call(tip)
 
+  // Build box for chart
+  svg.append("rect")
+      .attr("width", width)
+      .attr("height", height)
+
+  // Attach x axis and label
   svg.append("g")
-     .attr("class", "axis")
-     .attr("transform", "translate(0," + (h - padding) + ")")
-     .call(xAxis)
+      .classed("x axis", true)
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .classed("label", true)
+      .attr("text-anchor", "end")
+      .attr("x", width)
+      .attr("y", margin.bottom - 10)
+      .text(xCat)
 
+  // Attach y axis and label
   svg.append("g")
-     .attr("class", "axis")
-     .attr("transform", "translate(" + padding + ", 0)")
+     .classed("y axis", true)
      .call(yAxis)
-
-  var xLabel = svg.append("text")
-     .attr("class", "x label")
+    .append("text")
+     .classed("label", true)
      .attr("text-anchor", "end")
-     .attr("x", (w / 2) + 20)
-     .attr("y", h - 3)
-     .text("protein number")
-
-  var yLabel = svg.append("text")
-     .attr("class", "y label")
-     .attr("text-anchor", "end")
-     .attr("y", 0)
-     .attr("x", -(h / 2) + padding)
+     .attr("y", -margin.left)
      .attr("dy", ".75em")
      .attr("transform", "rotate(-90)")
-     .text("probability")
+     .text(yCat)
+  
+  var objects = svg.append("svg")
+      .classed("objects", true)
+      .attr("width", width)
+      .attr("height", height)
+
+  svg.append("svg")
+    .classed("axisLine hAxisLine", true)
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", width)
+    .attr("y2", 0)
+    .attr("transform", "translate(0," + height + ")")
+
+  objects.append("svg:line")
+      .classed("axisLine vAxisLine", true)
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", height)
+
+  // Draw datapoints
+  objects.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .classed("dot", true)
+      .attr("r", 0.75)
+      .attr("transform", transform)
+      .on("mouseover", tip.show)
+      .on("mouseout", tip.hide)
+
+  d3.select("input").on("click", change)
+
+  function change() {
+    xCat = "index"
+    xMax = d3.max(data, d => d[xCat])
+    xMin = d3.min(data, d => d[xCat])
+
+    zoomBeh.x(xScale.domain([xMin, xMax]))
+           .y(yScale.domain([yMin, yMax]))
+
+    var svg = d3.select("#scatter").transition()
+
+    svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xCat)
+    objects.selectAll(".dot").transition().duration(1000).attr("transform", transform)
+  }
+
+  function zoom() {
+    svg.select(".x.axis").call(xAxis)
+    svg.select(".y.axis").call(yAxis)
+
+    svg.selectAll(".dot")
+        .attr("transform", transform)
+  }
+
+  function transform(d) {
+    console.log(xScale(d[xCat]), yScale(d[yCat]))
+    return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
+  }
 })
