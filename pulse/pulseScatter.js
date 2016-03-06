@@ -124,18 +124,34 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .attr("x2", 0)
       .attr("y2", height)
 
+  function showSameProteins(d) {
+    tip.show(d)
+    // objects.selectAll(".dot")
+    //       .data(data)
+    //     .enter().append("circle")
+    //       .classed("dot", true)
+    //       .filter((d, i) => i["protein"] === d["protein"])
+    //       .attr("transform", transform)
+
+  }
+
+  function hideSameProteins(d) {
+    tip.hide(d)
+  }
+
   // Draw datapoints
   objects.selectAll(".dot")
       .data(data)
     .enter().append("circle")
       .classed("dot", true)
-      .attr("r", 5)
+      .attr("r", 3)
+      .on("mouseover", d => showSameProteins(d))
       .attr("transform", transform)
-      .on("mouseover", tip.show)
-      .on("mouseout", tip.hide)
+      .on("mouseout", d => hideSameProteins(d))
 
   d3.select("input").on("click", change)
 
+  // Reset zoom
   function change() {
     xCat = "index"
     xMax = d3.max(data, d => d[xCat])
@@ -146,8 +162,16 @@ d3.csv("data/protein_to_score.txt", function(data) {
 
     var svg = d3.select("#scatter").transition()
 
-    svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xLabel)
-    objects.selectAll(".dot").transition().duration(1000).attr("transform", transform)
+    svg.select(".x.axis")
+      .duration(750)
+      .call(xAxis)
+      .select(".label")
+      .text(xLabel)
+
+    objects.selectAll(".dot")
+      .transition()
+      .duration(1000)
+      .attr("transform", transform)
   }
 
   function zoom() {
