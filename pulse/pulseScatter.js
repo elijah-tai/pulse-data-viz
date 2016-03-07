@@ -27,6 +27,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
   // Build data array
   data.forEach(function(d) {
       d.index = +d.index
+      d.transcript = d.transcript
       d.protein = d.protein
       d.probability = +d.probability
   })
@@ -59,7 +60,8 @@ d3.csv("data/protein_to_score.txt", function(data) {
               .attr("class", "d3-tip")
               .offset([-10, 0])
               .html(
-                d => "protein: " + d["protein"] + "<br>" 
+                d => "transcript: " + d["transcript"] + "<br>" 
+                + "protein: " + d["protein"] + "<br>" 
                 + yCat + ": " + d[yCat]
               )
 

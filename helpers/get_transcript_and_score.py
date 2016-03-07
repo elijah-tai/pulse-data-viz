@@ -11,7 +11,7 @@ def get_transcripts(pulse_names_output_file):
     pulse_output = open(pulse_names_output_file, 'r')
     transcript_list = []
     for line in pulse_output:
-        transcript = line.split("//")[0].strip()
+        transcript = line.split(";")[0].strip("\"").split("\"")[1]
         transcript_list.append(transcript)
     return transcript_list
 
@@ -57,16 +57,18 @@ if __name__ == "__main__":
     protein_to_score = zip(protein_list, score_list)
     transcripts_to_score = zip(transcript_list, score_list)
 
+    transcript_to_protein_to_score = zip(transcript_list, protein_list, score_list)
+
     # Sort by probability
-    protein_to_score_sorted_by_score = sorted(protein_to_score, key=lambda x: x[1])
+    transcript_to_protein_to_score_sorted_by_score = sorted(transcript_to_protein_to_score, key=lambda x: x[2])
 
     # Write to file in data/
     with open('data/protein_to_score.txt', 'w') as f:
         # Change this between protein_to_score || transcript_to_score
         count = 1
-        f.write("index,protein,probability\n")
-        for triplet in protein_to_score_sorted_by_score:
-            f.write("{},{},{}\n".format(count, triplet[0], triplet[1]))
+        f.write("index,transcript,protein,probability\n")
+        for triplet in transcript_to_protein_to_score_sorted_by_score:
+            f.write("{},{},{},{}\n".format(count, triplet[0], triplet[1], triplet[2]))
             count = count + 1
 
 
