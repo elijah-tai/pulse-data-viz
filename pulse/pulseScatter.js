@@ -23,14 +23,7 @@ const xLabel = "protein number",
       yLabel = "probability"
 
 d3.csv("data/protein_to_score.txt", function(data) {
-  
-  // Build data array
-  data.forEach(function(d) {
-      d.index = +d.index
-      d.transcript = d.transcript
-      d.protein = d.protein
-      d.probability = +d.probability
-  })
+
 
   // Calculate ranges
   var xMax = d3.max(data, d => d[xCat]) * 1.05,

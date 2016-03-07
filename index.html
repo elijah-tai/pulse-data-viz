@@ -4,14 +4,66 @@
         <meta charset="utf-8">
         <title>PULSE Data Visualization</title>
         <link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
+        <link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
         <link rel="stylesheet" href="assets/css/bootstrap.min.css" charset="utf-8">
         <script src="d3/d3.v3.js" charset="utf-8"></script>
         <script src="d3/d3.tip.v0.6.3.js"></script>
     </head>
     <body>
         <!-- D3.js -->
-        <script src="pulse/pulseScatter.js" charset="utf-8"></script>
-        <script src="pulse/pulsePacking.js" charset="utf-8"></script>
+<!--         <script src="pulse/pulseScatter.js" charset="utf-8"></script> -->
+        <script>
+            var Vis = {}
+            Vis.data = new Array()
+            var width = 1200
+                height = 600,
+                data,
+                csvFile = "data/protein_to_score.txt"
+
+            var svg = d3.select("#viz")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+            
+            function createViz() {
+                // Create scatter plot group
+                var scatterGroup = svg.append("g")
+                    .attr("transform", "translate(50, 0)")
+                var scatter = d3.chart.scatter()
+                scatter.data(Vis.data)
+                scatter(scatterGroup)
+
+                // Create table group
+                var tableGroup = svg.append("g")
+                    .attr("transform", "translate(900, 0)")
+                var table = d3.chart.table()
+                table.data(Vis.data)
+
+                scatter.on("click", clicked =>
+                table.highlight(clicked))
+
+                table.on("change", changed =>
+                    scatter.data(changed)
+                    scatter.update())
+            }
+
+            function loadCsv(file_name) {
+                d3.csv(file_name, (error, file_data) => Vis.data = file.data
+                // Build data array
+                Vis.data.forEach(d =>
+                  d.index = +d.index
+                  d.transcript = d.transcript
+                  d.protein = d.protein
+                  d.probability = +d.probability
+                )
+                createViz()
+            }
+
+            // Load CSV --> create viz
+            loadCsv()
+
+        </script>
+        <script src="pulse/pulseTable.js" charset="utf-8"></script>
 
         <div class="jumbotron">
             <div class="container">
@@ -27,8 +79,8 @@
         </div>
 
         <div class="container">
-            <div id="packing"></div>
         </div>
-
+        
+        <div id="viz"></div>
     </body>
 </html>
