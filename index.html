@@ -12,75 +12,81 @@
     <body>
         <!-- D3.js -->
 <!--         <script src="pulse/pulseScatter.js" charset="utf-8"></script> -->
+        <script src="pulse/pulseTable.js" charset="utf-8"></script>
+
+        <div class="table"></div>
         <script>
             var Vis = {}
             Vis.data = new Array()
             var width = 1200
-                height = 600,
-                data,
-                csvFile = "data/protein_to_score.txt"
+                height = 600
 
-            var svg = d3.select("#viz")
+            var data
+            var csvFile = "data/protein_to_score.txt"
+
+            var svg = d3.select("body")
                         .append("svg")
                         .attr("width", width)
                         .attr("height", height)
             
             function createViz() {
                 // Create scatter plot group
-                var scatterGroup = svg.append("g")
-                    .attr("transform", "translate(50, 0)")
-                var scatter = d3.chart.scatter()
-                scatter.data(Vis.data)
-                scatter(scatterGroup)
+                // var scatterGroup = svg.append("g")
+                //     .attr("transform", "translate(50, 0)")
+                // var scatter = d3.chart.scatter()
+                // scatter.data(Vis.data)
+                // scatter(scatterGroup)
 
                 // Create table group
-                var tableGroup = svg.append("g")
-                    .attr("transform", "translate(900, 0)")
+                var tableGroup = d3.select(".table")
+                                   .attr("transform", "translate(0, 0)")
                 var table = d3.chart.table()
                 table.data(Vis.data)
+                table(tableGroup)
 
-                scatter.on("click", clicked =>
-                table.highlight(clicked))
+                // scatter.on("click", clicked =>
+                // table.highlight(clicked))
 
-                table.on("change", changed =>
-                    scatter.data(changed)
-                    scatter.update())
+                // table.on("change", function(changed) {
+                //     scatter.data(changed)
+                //     scatter.update()
+                // })
             }
 
             function loadCsv(file_name) {
-                d3.csv(file_name, (error, file_data) => Vis.data = file.data
+                d3.csv(file_name, function(error, file_data) { Vis.data = file_data
                 // Build data array
-                Vis.data.forEach(d =>
+                Vis.data.forEach(function(d) {
                   d.index = +d.index
                   d.transcript = d.transcript
                   d.protein = d.protein
                   d.probability = +d.probability
-                )
+                })
                 createViz()
+            })
             }
 
             // Load CSV --> create viz
-            loadCsv()
+            loadCsv(csvFile)
 
         </script>
-        <script src="pulse/pulseTable.js" charset="utf-8"></script>
-
-        <div class="jumbotron">
+        
+<!--         <div class="jumbotron">
             <div class="container">
                 <h1> Pulse Data Visualization </h1>
                 <p>Visualizing data from PULSE + comparing probabilities of protein stability from alternative splicing data. Currently under construction.</p>
                 <p><a href=https://github.com/wonjunetai/pulse-data-viz>GitHub</a> </p>
             </div>
-        </div>
+        </div> -->
 
-        <div class="container">
+<!--         <div class="container">
             <div id="scatter"></div>
             <button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
-        </div>
+        </div> -->
 
-        <div class="container">
-        </div>
+<!--         <div class="container">
+        </div> -->
+
         
-        <div id="viz"></div>
     </body>
 </html>
