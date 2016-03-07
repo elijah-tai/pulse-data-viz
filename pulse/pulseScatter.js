@@ -148,23 +148,18 @@ d3.csv("data/protein_to_score.txt", function(data) {
 
   function showSameProteins(d, clickData) {
     // hasn't been clicked before
-    console.log(clickData.isActive)
-    console.log(drawnData)
     if (!clickData.isActive) {
       objects.selectAll(".dot")
           .filter(p => d["protein"] !== p["protein"])
-          .remove()
+          .attr("r", 0.25)
+      objects.selectAll(".dot")
+          .filter(p => d["protein"] === p["protein"])
+          .attr("r", 5)
+          .transition().ease()
       clickData.isActive = !clickData.isActive
     } else { // has been clicked before
       objects.selectAll(".dot")
-          .data(data)
-        .enter().append("circle")
-          .classed("dot", true)
-          .attr("r", 3)
-          .attr("transform", transform)
-          .on("mouseover", tip.show)
-          .on("mouseout", tip.hide)
-          .on("click", d => showSameProteins(d, clickData))
+          .attr("r", 2)
       clickData.isActive = !clickData.isActive
     }
   }
