@@ -2,31 +2,33 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Pulse Data Visualization</title>
-        <link rel="stylesheet" href="assets/css/pulse_scatter.css" charset="utf-8">
+        <title>PULSE Data Visualization</title>
+        <link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
         <link rel="stylesheet" href="assets/css/bootstrap.min.css" charset="utf-8">
         <script src="d3/d3.v3.js" charset="utf-8"></script>
         <script src="d3/d3.tip.v0.6.3.js"></script>
     </head>
     <body>
-    
+        <!-- D3.js -->
+        <script src="pulse/pulseScatter.js" charset="utf-8"></script>
+        <script src="pulse/pulsePacking.js" charset="utf-8"></script>
+
         <div class="jumbotron">
             <div class="container">
                 <h1> Pulse Data Visualization </h1>
-                <p>Currently under construction.</p>
+                <p>Visualizing data from PULSE + comparing probabilities of protein stability from alternative splicing data. Currently under construction.</p>
+                <p><a href=https://github.com/wonjunetai/pulse-data-viz>GitHub</a> </p>
             </div>
         </div>
 
         <div class="container">
             <div id="scatter"></div>
-            <input type="button" name="xAxis" value="Reset zoom">
+            <button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
         </div>
 
         <div class="container">
-            <div id="proteinPacking"></div>
+            <div id="packing"></div>
         </div>
 
-        <script src="pulse/pulseScatter.js" charset="utf-8"></script>
-        <script src="pulse/pulsePacking.js" charset="utf-8"></script>
     </body>
 </html>

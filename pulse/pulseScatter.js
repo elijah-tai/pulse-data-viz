@@ -1,5 +1,9 @@
 'use strict'
 
+// if (!d3.chart) {
+//   d3.chart = {}
+// }
+
 const margin = { top: 50, right: 300, bottom: 50, left: 50},
     outerWidth = 1050,
     outerHeight = 500,
@@ -19,6 +23,7 @@ const xLabel = "protein number",
       yLabel = "probability"
 
 d3.csv("data/protein_to_score.txt", function(data) {
+  
   // Build data array
   data.forEach(function(d) {
       d.index = +d.index
@@ -58,7 +63,8 @@ d3.csv("data/protein_to_score.txt", function(data) {
                 + yCat + ": " + d[yCat]
               )
 
-  var zoomBeh = d3.behavior.zoom()
+  // Initialize zoom behaviour
+  var zoomBehavior = d3.behavior.zoom()
         .x(xScale)
         .y(yScale)
         .scaleExtent([0, 500])
@@ -71,7 +77,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
         .attr("height", outerHeight)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(zoomBeh)
+        .call(zoomBehavior)
 
   svg.call(tip)
 
@@ -109,7 +115,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .attr("width", width)
       .attr("height", height)
 
-  svg.append("svg")
+  svg.append("svg:line")
     .classed("axisLine hAxisLine", true)
     .attr("x1", 0)
     .attr("y1", 0)
@@ -124,32 +130,42 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .attr("x2", 0)
       .attr("y2", height)
 
-  function showSameProteins(d) {
-    tip.show(d)
-    // objects.selectAll(".dot")
-    //       .data(data)
-    //     .enter().append("circle")
-    //       .classed("dot", true)
-    //       .filter((d, i) => i["protein"] === d["protein"])
-    //       .attr("transform", transform)
-
+  var clickData = {
+    isActive: false
   }
 
-  function hideSameProteins(d) {
-    tip.hide(d)
-  }
-
-  // Draw datapoints
-  objects.selectAll(".dot")
+  var drawnData = objects.selectAll(".dot")
       .data(data)
     .enter().append("circle")
       .classed("dot", true)
       .attr("r", 3)
-      .on("mouseover", d => showSameProteins(d))
       .attr("transform", transform)
-      .on("mouseout", d => hideSameProteins(d))
+      .on("mouseover", tip.show)
+      .on("mouseout", tip.hide)
+      .on("click", d => showSameProteins(d, clickData))
 
-  d3.select("input").on("click", change)
+  function showSameProteins(d, clickData) {
+    // hasn't been clicked before
+    console.log(clickData.isActive)
+    if (!clickData.isActive) {
+      drawnData.filter(p => p["protein"] !== d["protein"])
+          .remove()
+      clickData.isActive = !clickData.isActive
+    } else {
+      drawnData = objects.selectAll(".dot")
+          .data(data)
+        .enter().append("circle")
+          .classed("dot", true)
+          .attr("r", 3)
+          .attr("transform", transform)
+          .on("mouseover", tip.show)
+          .on("mouseout", tip.hide)
+          .on("click", d => showSameProteins(d, clickData))
+      clickData.isActive = !clickData.isActive
+    }
+  }
+
+  d3.select("#xAxis").on("click", change)
 
   // Reset zoom
   function change() {
@@ -157,7 +173,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
     xMax = d3.max(data, d => d[xCat])
     xMin = d3.min(data, d => d[xCat])
 
-    zoomBeh.x(xScale.domain([xMin, xMax]))
+    zoomBehavior.x(xScale.domain([xMin, xMax]))
            .y(yScale.domain([yMin, yMax]))
 
     var svg = d3.select("#scatter").transition()
