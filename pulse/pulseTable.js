@@ -33,38 +33,37 @@ d3.chart.table = function() {
 				probabilityFieldWidth = 50
 
 		var	fieldHeight = 30
-		
-		transform("index")
+		var previousSort = null
+		refreshTable(null)
 
-		function transform(sortOn) {
+		function refreshTable(sortOn) {
+			console.log(sortOn)
+			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
 
 			// Draw header
 			var header = headerRow.selectAll("thead")
-				.data(dataToArray(data[0]))
+				.data(d3.keys(data[0]))
 				.enter().append("th")
 				.attr("class", (d, i) => "header" + i)
 				.on("click", function(d, i) {
-					transform(d[0])
+					refreshTable(d)
 				})
-				.text(d => d[0])
+				.text(d => d)
+
 
 			// start filling the table
-			var rows = rowsGrp.selectAll("tr")
+			var rows = rowsGrp.selectAll("g.row")
 				.data(data)
 				.enter().append("tr")
 				.attr("class", "row")
 
-			var rowsSort = rows.transition().duration(500)
-				.sort((a, b) => sort(a[sortOn], b[sortOn]))
-
 			var cells = rows.selectAll("td")
-				.data(d => dataToArray(d))
+				.data(d => d3.values(d))
 				.enter().append("td")
 				.attr("class", (d, i) => "cell" + i)
-				.on("click", (d, i) => transform(d[0]))
 				.append("text")
-				.text(d => d[1])
+				.text(d => d)
 
 			// Let's reformat some of the columns by index value
 			// Might be best to move this CSS
@@ -90,7 +89,20 @@ d3.chart.table = function() {
 			headerGrp.selectAll(".header3")
 				.attr("width", probabilityFieldWidth)
 			rowsGrp.selectAll(".cell3")
-				.attr("width", probabilityFieldWidth)	
+				.attr("width", probabilityFieldWidth)
+
+			if (sortOn !== null) {
+				if (sortOn != previousSort) {
+					rows.sort((a, b) => sort(a[sortOn], b[sortOn]))
+					previousSort = sortOn
+				}
+				else {
+					rows.sort((a, b) => sort(a[sortOn], b[sortOn]))
+					previousSort = null
+				}
+				rows.selectAll("td").select("text").text(String)
+
+			}
 		}			
 
 		function sort(a, b) {
@@ -100,21 +112,6 @@ d3.chart.table = function() {
 			else if (typeof a == "number") {
 				return a > b ? 1 : a == b ? 0 : -1
 			}
-		}
-
-		function dataKeyValueToArray(k, v) {
-			return [k, v]
-		}
-
-		function dataToArray(data) {
-			var result = new Array()
-			var key
-			for (key in data) {
-				if (data.hasOwnProperty(key)) {
-					result.push(dataKeyValueToArray(key, data[key]))
-				}
-			}
-			return result
 		}
 
 	}
