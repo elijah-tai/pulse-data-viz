@@ -5,7 +5,6 @@
         <title>PULSE Data Visualization</title>
         <link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
         <link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
-        <link rel="stylesheet" href="assets/css/bootstrap.min.css" charset="utf-8">
         <script src="d3/d3.v3.js" charset="utf-8"></script>
         <script src="d3/d3.tip.v0.6.3.js"></script>
     </head>
@@ -14,18 +13,18 @@
 <!--         <script src="pulse/pulseScatter.js" charset="utf-8"></script> -->
         <script src="pulse/pulseTable.js" charset="utf-8"></script>
 
-        <div class="table"></div>
+<!--         <div id="viz"></div> -->
         <script>
             var Vis = {}
             Vis.data = new Array()
-            var width = 1200
+            var width = 1000
                 height = 600
 
             var data
             var csvFile = "data/protein_to_score.txt"
 
-            var svg = d3.select("body")
-                        .append("svg")
+            var table = d3.select("body")
+                        .append("table")
                         .attr("width", width)
                         .attr("height", height)
             
@@ -38,8 +37,8 @@
                 // scatter(scatterGroup)
 
                 // Create table group
-                var tableGroup = d3.select(".table")
-                                   .attr("transform", "translate(0, 0)")
+                var tableGroup = d3.select("table")
+                                   .attr("transform", "translate(0, 10)")
                 var table = d3.chart.table()
                 table.data(Vis.data)
                 table(tableGroup)
@@ -70,23 +69,6 @@
             loadCsv(csvFile)
 
         </script>
-        
-<!--         <div class="jumbotron">
-            <div class="container">
-                <h1> Pulse Data Visualization </h1>
-                <p>Visualizing data from PULSE + comparing probabilities of protein stability from alternative splicing data. Currently under construction.</p>
-                <p><a href=https://github.com/wonjunetai/pulse-data-viz>GitHub</a> </p>
-            </div>
-        </div> -->
-
-<!--         <div class="container">
-            <div id="scatter"></div>
-            <button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
-        </div> -->
-
-<!--         <div class="container">
-        </div> -->
-
         
     </body>
 </html>
