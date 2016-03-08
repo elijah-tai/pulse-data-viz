@@ -1,6 +1,6 @@
-.rowsGrp {
-	max-height: 300px;
-	overflow: auto;
+.table-scroll {
+	height: 300px;
+	overflow: scroll;
 }
 
 .cell0, .cell1, .cell2 {

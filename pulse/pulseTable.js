@@ -25,7 +25,8 @@ d3.chart.table = function() {
 		var headerGrp = table.append("table").attr("class", "headerGrp")
 		var headerRow = headerGrp.append("thead")
 
-		var rowsGrp = table.append("table").attr("class", "rowsGrp")
+		var rowsDiv = table.append("div").attr("class", "table-scroll")
+		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 
 		var indexFieldWidth = 60,
 				transcriptFieldWidth = 140,
@@ -50,7 +51,6 @@ d3.chart.table = function() {
 					refreshTable(d)
 				})
 				.text(d => d)
-
 
 			// start filling the table
 			var rows = rowsGrp.selectAll("g.row")
@@ -93,11 +93,11 @@ d3.chart.table = function() {
 
 			if (sortOn !== null) {
 				if (sortOn != previousSort) {
-					rows.sort((a, b) => sort(a[sortOn], b[sortOn]))
+					rows.sort((a, b) => sort(a[sortOn], b[sortOn], previousSort))
 					previousSort = sortOn
 				}
 				else {
-					rows.sort((a, b) => sort(a[sortOn], b[sortOn]))
+					rows.sort((a, b) => sort(a[sortOn], b[sortOn], previousSort))
 					previousSort = null
 				}
 				rows.selectAll("td").select("text").text(String)
@@ -105,12 +105,18 @@ d3.chart.table = function() {
 			}
 		}			
 
-		function sort(a, b) {
-			if (typeof a == "string") {
+		function sort(a, b, previousSort) {
+			if (typeof a == "string" && previousSort == null) {
 				return a.localeCompare(b)
+			} 
+			else if (typeof a == "string" && (previousSort == "transcript" || previousSort == "protein")) {
+				return b.localeCompare(a)
 			}
-			else if (typeof a == "number") {
+			else if (typeof a == "number" && previousSort == null) {
 				return a > b ? 1 : a == b ? 0 : -1
+			}
+			else if (typeof a == "number" && (previousSort == "index" || previousSort == "probability")) {
+				return b > a ? 1 : a == b ? 0 : -1
 			}
 		}
 
