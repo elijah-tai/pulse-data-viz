@@ -4,10 +4,11 @@
 //   d3.chart = {}
 // }
 
-const margin = { top: 50, right: 300, bottom: 50, left: 50},
-    outerWidth = 1050,
-    outerHeight = 500,
-    width = outerWidth - margin.left - margin.right,
+var margin = { top: 50, right: 30, bottom: 50, left: 50},
+    outerWidth = 700,
+    outerHeight = 500
+
+var width = outerWidth - margin.left - margin.right,
     height = outerHeight - margin.top - margin.bottom
 
 var xScale = d3.scale.linear()
@@ -23,7 +24,14 @@ const xLabel = "protein number",
       yLabel = "probability"
 
 d3.csv("data/protein_to_score.txt", function(data) {
-
+  
+  // Build data array
+  data.forEach(function(d) {
+      d.index = +d.index
+      d.transcript = d.transcript
+      d.protein = d.protein
+      d.probability = +d.probability
+  })
 
   // Calculate ranges
   var xMax = d3.max(data, d => d[xCat]) * 1.05,
@@ -133,7 +141,7 @@ d3.csv("data/protein_to_score.txt", function(data) {
       .data(data)
     .enter().append("circle")
       .classed("dot", true)
-      .attr("r", 3)
+      .attr("r", 2)
       .attr("transform", transform)
       .on("mouseover", tip.show)
       .on("mouseout", tip.hide)

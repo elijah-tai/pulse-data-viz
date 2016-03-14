@@ -1,0 +1,18 @@
+.projects {
+	text-align: center;
+	width: 1000px;
+	margin: 0 auto;
+}
+
+#scatter {
+	width: 700px;
+	height: 500px;
+	float: left;
+}
+
+#table {
+	width: 300px;
+	height: 500px;
+	margin-top: 5%;
+	margin-left: 700px;
+}

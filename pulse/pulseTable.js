@@ -26,12 +26,13 @@ d3.chart.table = function() {
 		var headerRow = headerGrp.append("thead")
 
 		var rowsDiv = table.append("div").attr("class", "table-scroll")
+			.attr("width", width)
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 
 		var indexFieldWidth = 60,
 				transcriptFieldWidth = 140,
 				proteinFieldWidth = 105,
-				probabilityFieldWidth = 50
+				probabilityFieldWidth = 70
 
 		var	fieldHeight = 30
 		var previousSort = null
