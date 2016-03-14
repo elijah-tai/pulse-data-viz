@@ -26,21 +26,23 @@
             Vis.data = new Array()
             var data
             var csvFile = "data/protein_to_score.txt"
-            var table = d3.select("#table")
-                        .append("table")
-                        .attr("width", width)
-                        .attr("height", height)
             
+            var scatterWidth = 700,
+                scatterHeight = 500
+                            
             function createViz() {
                 // Create scatter plot group
-                // var scatterGroup = svg.append("g")
-                //     .attr("transform", "translate(50, 0)")
-                // var scatter = d3.chart.scatter()
-                // scatter.data(Vis.data)
-                // scatter(scatterGroup)
+                var sgroup = d3.select("#scatter")
+                                .append("svg")
+                                    .attr("width", scatterWidth)
+                                    .attr("height", scatterHeight)
+                                .append("g")
+                var scatter = d3.chart.scatter()
+                scatter.data(Vis.data)
+                scatter(sgroup)
+
                 // Create table group
                 var tableGroup = d3.select("table")
-                                   .attr("transform", "translate(500, 0)")
                 var table = d3.chart.table()
                 table.data(Vis.data)
                 table(tableGroup)

@@ -6,27 +6,28 @@ d3.chart.table = function() {
 	var g
 	var data
 	var margin = {top: 20, right: 30, bottom: 30, left: 40},
-			width = 600 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom
+			tableWidth = 600 - margin.left - margin.right,
+			tableHeight = 500 - margin.top - margin.bottom
 
 	var dispatch = d3.dispatch(chart, "clicked")
 
 	function chart(container) {
 		g = container
+		console.log(g)
 		update()
 	}
 
 	chart.update = update
 
 	function update() {
-		var table = g.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
+		var table = g.attr("width", tableWidth + margin.left + margin.right)
+				.attr("height", tableHeight + margin.top + margin.bottom)
 
 		var headerGrp = table.append("table").attr("class", "headerGrp")
 		var headerRow = headerGrp.append("thead")
 
 		var rowsDiv = table.append("div").attr("class", "table-scroll")
-			.attr("width", width)
+			.attr("width", tableWidth)
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 
 		var indexFieldWidth = 60,
@@ -130,14 +131,14 @@ d3.chart.table = function() {
 	}
 
 	chart.width = function(value) {
-		if(!arguments.length) return width
-		width = value
+		if(!arguments.length) return tableWidth
+		tableWidth = value
 		return chart
 	}
 
 	chart.height = function(value) {
-		if(!arguments.length) return height
-		height = value
+		if(!arguments.length) return tableHeight
+		tableHeight = value
 		return chart
 	}
 
