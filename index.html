@@ -42,10 +42,12 @@
                 scatter(sgroup)
 
                 // Create table group
-                var tableGroup = d3.select("table")
+                var tableGroup = d3.select("#table")
                 var table = d3.chart.table()
                 table.data(Vis.data)
                 table(tableGroup)
+
+                // Scatter-table coordination goes here
                 // scatter.on("click", clicked =>
                 // table.highlight(clicked))
                 // table.on("change", function(changed) {
