@@ -61,19 +61,7 @@ d3.chart.scatter = function() {
 		clickData = {
 			isActive: false
 		}
-		console.log(filteredData[0])
-		console.log("showProteins clicked")
-		console.log(objects)
-		objects.selectAll(".dot")
-			.filter(function(p) {
-				filteredData[0]["protein"] !== p["protein"]
-			})
-			.attr("r", 0.25)
-		objects.selectAll(".dot")
-			.filter(function(p) { 
-				filteredData[0]["protein"] === p["protein"]
-			})
-			.transition().duration(1500).attr("r", 3)
+		showSameProteins(filteredData[0], clickData)
 	}
 
 	function update() {
@@ -200,6 +188,7 @@ d3.chart.scatter = function() {
 			g.selectAll(".dot")
 					.attr("transform", transform)
 		}
+
 	}
 
 	function transform(d) {
@@ -207,18 +196,19 @@ d3.chart.scatter = function() {
 	}
 
 	function showSameProteins(d, clickData) {
+		console.log(d)
 		// hasn't been clicked before
 		if (!clickData.isActive) {
-			objects.selectAll(".dot")
+			drawnData
 					.filter(p => d["protein"] !== p["protein"])
-					.transition().duration(500)
+					.transition().duration(250)
 					.attr("r", 0.25)
-			objects.selectAll(".dot")
+			drawnData
 					.filter(p => d["protein"] === p["protein"])
-					.transition().duration(1500).attr("r", 3)
+					.transition().duration(750).attr("r", 3)
 			clickData.isActive = !clickData.isActive
 		} else { // has been clicked before
-			objects.selectAll(".dot")
+			drawnData
 					.transition().duration(500)
 					.attr("r", 2)
 			clickData.isActive = !clickData.isActive
