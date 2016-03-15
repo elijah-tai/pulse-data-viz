@@ -1,203 +1,244 @@
 'use strict'
 
-// if (!d3.chart) {
-//   d3.chart = {}
-// }
+if (!d3.chart) d3.chart = {}
 
-const margin = { top: 50, right: 300, bottom: 50, left: 50},
-    outerWidth = 1050,
-    outerHeight = 500,
-    width = outerWidth - margin.left - margin.right,
-    height = outerHeight - margin.top - margin.bottom
+d3.chart.scatter = function() {
+	var g
+	var data
 
-var xScale = d3.scale.linear()
-                     .range([0, width]).nice()
+	var drawnData
+	var clickData
+	var objects
 
-var yScale = d3.scale.linear()
-                     .range([height, 0])
+	var tip
+	
+	var margin = { top: 50, right: 30, bottom: 50, left: 50}
+	var width = scatterWidth - margin.left - margin.right,
+			height = scatterHeight - margin.top - margin.bottom
 
-var xCat = "index",
-    yCat = "probability"
+	var xCat = "index",
+			xLabel = "protein number",
+			yCat = "probability",
+			yLabel = "probability",
+			xScale,
+			yScale
 
-const xLabel = "protein number",
-      yLabel = "probability"
+	var dispatch = d3.dispatch(chart, "clicked")
 
-d3.csv("data/protein_to_score.txt", function(data) {
-  
-  // Build data array
-  data.forEach(function(d) {
-      d.index = +d.index
-      d.transcript = d.transcript
-      d.protein = d.protein
-      d.probability = +d.probability
-  })
+	function chart(container) {
+		g = container
 
-  // Calculate ranges
-  var xMax = d3.max(data, d => d[xCat]) * 1.05,
-      xMin = d3.min(data, d => d[xCat]),
-      // If xMin > 0, set xMin = 0, else xMin
-      xMin = xMin > 0 ? 0 : xMin,
-      yMax = d3.max(data, d => d[yCat]) * 1.05,
-      // If yMax < 1, set yMax = 1, else, yMax
-      yMax = yMax < 1 ? 1 : yMax,
-      yMin = d3.min(data, d => d[yCat]),
-      yMin = yMin > 0 ? 0 : yMin
+		// Build box for chart
+		var	rect = g.append("rect")
+			.attr("width", width)
+			.attr("height", height)
 
-  xScale.domain([xMin, xMax])
-  yScale.domain([yMin, yMax])
+		g.append("g")
+			.classed("x axis", true)
 
-  // Build axis
-  var xAxis = d3.svg.axis()
-                    .scale(xScale)
-                    .orient("bottom")
+		g.append("g")
+			.classed("y axis", true)
 
-  var yAxis = d3.svg.axis()
-                    .scale(yScale)
-                    .orient("left")
+		// Initialize tooltip
+		tip = d3.tip()
+			.attr("class", "d3-tip")
+			.offset([-10, 0])
+			.html(
+				d => "transcript: " + d["transcript"] + "<br>" 
+				+ "protein: " + d["protein"] + "<br>" 
+				+ yCat + ": " + d[yCat]
+			)
 
-  // Initialize tooltip
-  var tip = d3.tip()
-              .attr("class", "d3-tip")
-              .offset([-10, 0])
-              .html(
-                d => "transcript: " + d["transcript"] + "<br>" 
-                + "protein: " + d["protein"] + "<br>" 
-                + yCat + ": " + d[yCat]
-              )
+		g.call(tip)
 
-  // Initialize zoom behaviour
-  var zoomBehavior = d3.behavior.zoom()
-        .x(xScale)
-        .y(yScale)
-        .scaleExtent([0, 500])
-        .on("zoom", zoom)
+		update()
+	}
 
-  // Build svg
-  var svg = d3.select("#scatter")
-      .append("svg")
-        .attr("width", outerWidth)
-        .attr("height", outerHeight)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(zoomBehavior)
+	chart.update = update
+	chart.showProteins = showProteins
 
-  svg.call(tip)
+	function showProteins(filteredData) {
+		clickData = {
+			isActive: false
+		}
+		showSameProteins(filteredData[0], clickData)
+	}
 
-  // Build box for chart
-  svg.append("rect")
-      .attr("width", width)
-      .attr("height", height)
+	function update() {
 
-  // Attach x axis and label
-  svg.append("g")
-      .classed("x axis", true)
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    .append("text")
-      .classed("label", true)
-      .attr("text-anchor", "end")
-      .attr("x", width)
-      .attr("y", margin.bottom - 10)
-      .text(xLabel)
+		// x axis
+		var xMax = d3.max(data, d => d[xCat]) * 1.05,
+				xMin = d3.min(data, d => d[xCat]),
+				xMin = xMin > 0 ? 0 : xMin
 
-  // Attach y axis and label
-  svg.append("g")
-     .classed("y axis", true)
-     .call(yAxis)
-    .append("text")
-     .classed("label", true)
-     .attr("text-anchor", "end")
-     .attr("y", -margin.left)
-     .attr("dy", ".75em")
-     .attr("transform", "rotate(-90)")
-     .text(yCat)
-  
-  var objects = svg.append("svg")
-      .classed("objects", true)
-      .attr("width", width)
-      .attr("height", height)
+		xScale = d3.scale.linear().range([0, width]).nice()
+		xScale.domain([xMin, xMax])
 
-  svg.append("svg:line")
-    .classed("axisLine hAxisLine", true)
-    .attr("x1", 0)
-    .attr("y1", 0)
-    .attr("x2", width)
-    .attr("y2", 0)
-    .attr("transform", "translate(0," + height + ")")
+		var xAxis = d3.svg.axis()
+											.scale(xScale)
+											.orient("bottom")
 
-  objects.append("svg:line")
-      .classed("axisLine vAxisLine", true)
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", 0)
-      .attr("y2", height)
+		var xg = g.select(".x.axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis)
+			.append("text")
+				.classed("label", true)
+				.attr("text-anchor", "end")
+				.attr("x", width)
+				.attr("y", margin.bottom - 10)
+				.text(xLabel)
 
-  var clickData = {
-    isActive: false
-  }
 
-  var drawnData = objects.selectAll(".dot")
-      .data(data)
-    .enter().append("circle")
-      .classed("dot", true)
-      .attr("r", 3)
-      .attr("transform", transform)
-      .on("mouseover", tip.show)
-      .on("mouseout", tip.hide)
-      .on("click", d => showSameProteins(d, clickData))
+		// y axis
+		var yMax = d3.max(data, d => d[yCat]) * 1.05,
+				yMax = yMax < 1 ? 1 : yMax,
+				yMin = d3.min(data, d => d[yCat]),
+				yMin = yMin > 0 ? 0 : yMin
 
-  function showSameProteins(d, clickData) {
-    // hasn't been clicked before
-    if (!clickData.isActive) {
-      objects.selectAll(".dot")
-          .filter(p => d["protein"] !== p["protein"])
-          .attr("r", 0.25)
-      objects.selectAll(".dot")
-          .filter(p => d["protein"] === p["protein"])
-          .attr("r", 5)
-          .transition().ease()
-      clickData.isActive = !clickData.isActive
-    } else { // has been clicked before
-      objects.selectAll(".dot")
-          .attr("r", 2)
-      clickData.isActive = !clickData.isActive
-    }
-  }
+		yScale = d3.scale.linear().range([height, 0])
+		yScale.domain([yMin, yMax])
 
-  d3.select("#xAxis").on("click", change)
+		var yAxis = d3.svg.axis()
+											.scale(yScale)
+											.orient("left")
 
-  // Reset zoom
-  function change() {
-    xCat = "index"
-    xMax = d3.max(data, d => d[xCat])
-    xMin = d3.min(data, d => d[xCat])
+		var yg = g.select(".y.axis")
+			 .call(yAxis)
+			.append("text")
+			 .classed("label", true)
+			 .attr("text-anchor", "end")
+			 .attr("y", -margin.left)
+			 .attr("dy", ".75em")
+			 .attr("transform", "rotate(-90)")
+			 .text(yCat)
 
-    zoomBehavior.x(xScale.domain([xMin, xMax]))
-           .y(yScale.domain([yMin, yMax]))
+		// Initialize zoom behaviour
+		var zoomBehavior = d3.behavior.zoom()
+					.x(xScale)
+					.y(yScale)
+					.scaleExtent([0, 500])
+					.on("zoom", zoom)
 
-    var svg = d3.select("#scatter").transition()
+		g.call(zoomBehavior)
 
-    svg.select(".x.axis")
-      .duration(750)
-      .call(xAxis)
-      .select(".label")
-      .text(xLabel)
+		objects = g.append("svg")
+			.classed("objects", true)
+			.attr("width", width)
+			.attr("height", height)
 
-    objects.selectAll(".dot")
-      .transition()
-      .duration(1000)
-      .attr("transform", transform)
-  }
+		g.append("svg:line")
+			.classed("axisLine hAxisLine", true)
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", width)
+			.attr("y2", 0)
+			.attr("transform", "translate(0," + scatterWidth + ")")
 
-  function zoom() {
-    svg.select(".x.axis").call(xAxis)
-    svg.select(".y.axis").call(yAxis)
+		objects.append("svg:line")
+			.classed("axisLine vAxisLine", true)
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 0)
+			.attr("y2", scatterHeight)
 
-    svg.selectAll(".dot")
-        .attr("transform", transform)
-  }
+		clickData = {
+			isActive: false,
+			prevClicked: new Set()
+		}
 
-  function transform(d) {
-    return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
-  }
-})
+		drawnData = objects.selectAll(".dot")
+				.data(data)
+			.enter().append("circle")
+				.classed("dot", true)
+				.attr("r", 2)
+				.attr("transform", transform)
+				.on("mouseover", tip.show)
+				.on("mouseout", tip.hide)
+				.on("click", d => showSameProteins(d, clickData))
+
+		d3.select("#xAxis").on("click", change)
+
+		// Reset zoom
+		function change() {
+			xCat = "index"
+			xMax = d3.max(data, d => d[xCat])
+			xMin = d3.min(data, d => d[xCat])
+
+			zoomBehavior.x(xScale.domain([xMin, xMax]))
+						 .y(yScale.domain([yMin, yMax]))
+
+			var svg = d3.select("#scatter").transition()
+
+			svg.select(".x.axis")
+				.duration(750)
+				.call(xAxis)
+				.select(".label")
+				.text(xLabel)
+
+			objects.selectAll(".dot")
+				.transition()
+				.duration(1000)
+				.attr("transform", transform)
+		}
+
+		function zoom() {
+			g.select(".x.axis").call(xAxis)
+			g.select(".y.axis").call(yAxis)
+
+			g.selectAll(".dot")
+					.attr("transform", transform)
+		}
+
+	}
+
+	function transform(d) {
+		return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
+	}
+
+	function showSameProteins(d, clickData) {
+		console.log(d)
+		// hasn't been clicked before
+		if (!clickData.isActive) {
+			drawnData
+					.filter(p => d["protein"] !== p["protein"])
+					.transition().duration(250)
+					.attr("r", 0.25)
+			drawnData
+					.filter(p => d["protein"] === p["protein"])
+					.transition().duration(750).attr("r", 3)
+			clickData.isActive = !clickData.isActive
+		} else { // has been clicked before
+			drawnData
+					.transition().duration(500)
+					.attr("r", 2)
+			clickData.isActive = !clickData.isActive
+		}
+	}
+
+	chart.resetSelection = function() {
+		objects.selectAll(".dot").transition().duration(500).attr("r", 2)
+	}
+
+	//combination getter and setter for the data attribute of the global chart variable
+	chart.data = function(value) {
+		if(!arguments.length) return data;
+		data = value;
+		return chart;
+	}
+		
+	//combination getter and setter for the width attribute of the global chart variable
+	chart.width = function(value) {
+		if(!arguments.length) return width;
+		width = value;
+		return chart;
+	}
+		
+	//combination getter and setter for the height attribute of the global chart variable
+	chart.height = function(value) {
+		if(!arguments.length) return height;
+		height = value;
+		return chart;
+	}
+
+	return d3.rebind(chart, dispatch, "on")
+}
