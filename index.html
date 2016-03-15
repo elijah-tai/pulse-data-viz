@@ -1,85 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>PULSE Data Visualization</title>
-        <link rel="stylesheet" href="assets/css/main.css" charset="utf-8">
-        <link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
-        <link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
-        <script src="d3/d3.v3.js" charset="utf-8"></script>
-        <script src="d3/d3.tip.v0.6.3.js"></script>
-    </head>
-    <body>
-        <script src="pulse/pulseTable.js" charset="utf-8"></script>
-        <script src="pulse/pulseScatter.js" charset="utf-8"></script>
+	<head>
+		<meta charset="utf-8">
+		<title>PULSE Data Visualization</title>
+		<link rel="stylesheet" href="assets/css/main.css" charset="utf-8">
+		<link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
+		<link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
+		<script src="d3/d3.v3.js" charset="utf-8"></script>
+		<script src="d3/d3.tip.v0.6.3.js"></script>
+	</head>
+	<body>
+		<script src="pulse/pulseTable.js" charset="utf-8"></script>
+		<script src="pulse/pulseScatter.js" charset="utf-8"></script>
 
-        <div class="projects">
-            <h1>PULSE Data Visualization</h1>
-            <div id="scatter"></div>
-            <div id="table"></div>
-            <button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
-            <button id="resetSelection" type="button" name="resetSelection">Reset Selection</button>
-        </div>
-        
+		<div class="projects">
+			<h1>PULSE Data Visualization</h1>
+			<div id="scatter"></div>
+			<div id="table"></div>
+			<button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
+			<button id="resetSelection" type="button" name="resetSelection">Reset Selection</button>
+		</div>
+		
 
-        <script>
-            var Vis = {}
-            Vis.data = new Array()
-            var data
-            var csvFile = "data/protein_to_score.txt"
-            
-            var scatterWidth = 700,
-                scatterHeight = 500
-            var scatterMargin = { top: 50, right: 30, bottom: 50, left: 50}
-                            
-            function createViz() {
-                // Create scatter plot group
-                var sgroup = d3.select("#scatter")
-                                .append("svg")
-                                    .attr("width", scatterWidth)
-                                    .attr("height", scatterHeight)
-                                .append("g")
-                                    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")")
-                var scatter = d3.chart.scatter()
-                scatter.data(Vis.data)
-                scatter(sgroup)
+		<script>
+			var Vis = {}
+			Vis.data = new Array()
+			var data
+			var csvFile = "data/protein_to_score.txt"
+			
+			var scatterWidth = 700,
+				scatterHeight = 500
+			var scatterMargin = { top: 50, right: 30, bottom: 50, left: 50}
+							
+			function createViz() {
+				// Create scatter plot group
+				var sgroup = d3.select("#scatter")
+								.append("svg")
+									.attr("width", scatterWidth)
+									.attr("height", scatterHeight)
+								.append("g")
+									.attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")")
+				var scatter = d3.chart.scatter()
+				scatter.data(Vis.data)
+				scatter(sgroup)
 
-                // Create table group
-                var tableGroup = d3.select("#table")
-                var table = d3.chart.table()
-                table.data(Vis.data)
-                table(tableGroup)
+				// Create table group
+				var tableGroup = d3.select("#table")
+				var table = d3.chart.table()
+				table.data(Vis.data)
+				table(tableGroup)
 
-                // Scatter-table coordination goes here
+				// Scatter-table coordination goes here
 
-                table.on("clicked", function(filtered) {
-                    console.log(filtered)
-                    scatter.showProteins(filtered)
-                    scatter.update()
-                })
+				table.on("clicked", function(filtered) {
+					console.log(filtered)
+					scatter.showProteins(filtered)
+					scatter.update()
+				})
 
-                // scatter.on("click", clicked =>
-                // table.highlight(clicked))
-                // table.on("change", function(changed) {
-                //     scatter.data(changed)
-                //     scatter.update()
-                // })
-            }
-            function loadCsv(file_name) {
-                d3.csv(file_name, function(error, file_data) { Vis.data = file_data
-                // Build data array
-                Vis.data.forEach(function(d) {
-                  d.index = +d.index
-                  d.transcript = d.transcript
-                  d.protein = d.protein
-                  d.probability = +d.probability
-                })
-                createViz()
-            })
-            }
-            // Load CSV --> create viz
-            loadCsv(csvFile)
-        </script>
+				// scatter.on("click", clicked =>
+				// table.highlight(clicked))
+				// table.on("change", function(changed) {
+				//     scatter.data(changed)
+				//     scatter.update()
+				// })
+			}
+			function loadCsv(file_name) {
+				d3.csv(file_name, function(error, file_data) { Vis.data = file_data
+				// Build data array
+				Vis.data.forEach(function(d) {
+				  d.index = +d.index
+				  d.transcript = d.transcript
+				  d.protein = d.protein
+				  d.probability = +d.probability
+				})
+				createViz()
+			})
+			}
+			// Load CSV --> create viz
+			loadCsv(csvFile)
+		</script>
 
-    </body>
+	</body>
 </html>
