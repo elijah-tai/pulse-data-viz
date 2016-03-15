@@ -8,6 +8,9 @@ d3.chart.scatter = function() {
   var rect
   var xaxis
   var yaxis
+  var drawnData
+  var clickData
+  var objects
   var margin = { top: 50, right: 30, bottom: 50, left: 50}
   var width = scatterWidth - margin.left - margin.right,
       height = scatterHeight - margin.top - margin.bottom
@@ -32,10 +35,19 @@ d3.chart.scatter = function() {
 
     g.append("g")
       .classed("y axis", true)
+
     update()
   }
 
   chart.update = update
+  chart.showProteins = showProteins
+
+  function showProteins(filteredData) {
+    var clickData = {
+      isActive: false
+    }
+    console.log(drawnData)
+  }
 
   function update() {
 
@@ -94,7 +106,7 @@ d3.chart.scatter = function() {
 
     g.call(zoomBehavior)
 
-    var objects = g.append("svg")
+    objects = g.append("svg")
       .classed("objects", true)
       .attr("width", width)
       .attr("height", height)
@@ -114,10 +126,6 @@ d3.chart.scatter = function() {
       .attr("x2", 0)
       .attr("y2", scatterHeight)
 
-    var clickData = {
-      isActive: false
-    }
-
     // Initialize tooltip
     var tip = d3.tip()
                 .attr("class", "d3-tip")
@@ -130,7 +138,12 @@ d3.chart.scatter = function() {
 
     g.call(tip)
 
-    var drawnData = objects.selectAll(".dot")
+    clickData = {
+      isActive: false,
+      prevClicked: new Set()
+    }
+
+    drawnData = objects.selectAll(".dot")
         .data(data)
       .enter().append("circle")
         .classed("dot", true)
@@ -141,6 +154,13 @@ d3.chart.scatter = function() {
         .on("click", d => showSameProteins(d, clickData))
 
     function showSameProteins(d, clickData) {
+
+      // if clickData set has clicked protein, then don't highlight
+      // if (clickData.prevClicked.has(d)) {
+      //   objects.selectAll(".dot")
+      //     .filter(p => d["protein"] )
+      // }
+
       // hasn't been clicked before
       if (!clickData.isActive) {
         objects.selectAll(".dot")
@@ -148,17 +168,22 @@ d3.chart.scatter = function() {
             .attr("r", 0.25)
         objects.selectAll(".dot")
             .filter(p => d["protein"] === p["protein"])
-            .attr("r", 5)
-            .transition().ease()
+            .transition().duration(750).attr("r", 5)
         clickData.isActive = !clickData.isActive
       } else { // has been clicked before
         objects.selectAll(".dot")
+            .transition().duration(500)
             .attr("r", 2)
         clickData.isActive = !clickData.isActive
       }
     }
 
     d3.select("#xAxis").on("click", change)
+    d3.select("#resetSelection").on("click", resetSelection)
+
+    function resetSelection() {
+      objects.selectAll(".dot").transition().duration(500).attr("r", 2)
+    }
 
     // Reset zoom
     function change() {
@@ -195,6 +220,7 @@ d3.chart.scatter = function() {
       return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
     }
   }
+
 
   //combination getter and setter for the data attribute of the global chart variable
   chart.data = function(value) {

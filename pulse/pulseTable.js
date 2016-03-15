@@ -9,11 +9,14 @@ d3.chart.table = function() {
 			tableWidth = 600 - margin.left - margin.right,
 			tableHeight = 500 - margin.top - margin.bottom
 
+	var clickData = {
+		prevClicked: new Set()
+	}
+
 	var dispatch = d3.dispatch(chart, "clicked")
 
 	function chart(container) {
 		g = container
-		console.log(g)
 		update()
 	}
 
@@ -29,18 +32,35 @@ d3.chart.table = function() {
 		var rowsDiv = table.append("div").attr("class", "table-scroll")
 			.attr("width", tableWidth)
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
+		var rows, cells
 
 		var indexFieldWidth = 60,
-				transcriptFieldWidth = 140,
-				proteinFieldWidth = 105,
-				probabilityFieldWidth = 70
+			transcriptFieldWidth = 140,
+			proteinFieldWidth = 105,
+			probabilityFieldWidth = 70
 
 		var	fieldHeight = 30
 		var previousSort = null
 		refreshTable(null)
 
+		// When row clicked, dispatch data clicked
+		rows.on("click", function(d) {
+			// if d not in previously clicked data, change colour
+			if (!clickData.prevClicked.has(d)) {
+				d3.select(this).style("background-color", "#ffff99")
+				clickData.prevClicked.add(d)
+				clickData.isActive = !clickData.isActive
+				dispatch.clicked([d])
+			}
+			else {
+				d3.select(this).style("background-color", "#ffffff")
+				clickData.prevClicked.delete(d)
+				clickData.isActive = !clickData.isActive
+				dispatch.clicked([])
+			}
+		})
+
 		function refreshTable(sortOn) {
-			console.log(sortOn)
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
 
@@ -55,12 +75,12 @@ d3.chart.table = function() {
 				.text(d => d)
 
 			// start filling the table
-			var rows = rowsGrp.selectAll("g.row")
+			rows = rowsGrp.selectAll("g.row")
 				.data(data)
 				.enter().append("tr")
 				.attr("class", "row")
 
-			var cells = rows.selectAll("td")
+			cells = rows.selectAll("td")
 				.data(d => d3.values(d))
 				.enter().append("td")
 				.attr("class", (d, i) => "cell" + i)
