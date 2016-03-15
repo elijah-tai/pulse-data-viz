@@ -46,7 +46,6 @@ d3.chart.table = function() {
 
 		// When row clicked, dispatch data clicked
 		rows.on("click", function(d) {
-			console.log(clickData.prevClicked)
 			// if d not in previously clicked data, change colour
 			if (clickData.isActive == false) {
 				d3.select(this).style("background-color", "#ffff99")
@@ -63,7 +62,6 @@ d3.chart.table = function() {
 			} 
 			// clicked again, but different thing --> erase highlight of old, highlight new
 			else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ != d3.select(this)[0][0].__data__)) {
-				console.log(d3.select(this))
 				clickData.prevClicked.style("background-color", "#ffffff")
 				d3.select(this).style("background-color", "#ffff99")
 				clickData.prevClicked = d3.select(this)
@@ -154,6 +152,12 @@ d3.chart.table = function() {
 			}
 		}
 
+	}
+
+	chart.resetSelection = function() {
+		if (clickData.prevClicked) {
+			clickData.prevClicked.style("background-color", "#ffffff")	
+		}
 	}
 
 	chart.data = function(value) {

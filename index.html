@@ -31,7 +31,9 @@
 			var scatterWidth = 700,
 				scatterHeight = 500
 			var scatterMargin = { top: 50, right: 30, bottom: 50, left: 50}
-							
+			
+
+
 			function createViz() {
 				// Create scatter plot group
 				var sgroup = d3.select("#scatter")
@@ -49,6 +51,12 @@
 				var table = d3.chart.table()
 				table.data(Vis.data)
 				table(tableGroup)
+
+				var resetButton = d3.select("#resetSelection")
+					.on("click", function() {
+						table.resetSelection()
+						scatter.resetSelection()
+					})
 
 				// Scatter-table coordination goes here
 

@@ -59,20 +59,21 @@ d3.chart.scatter = function() {
 
 	function showProteins(filteredData) {
 		clickData = {
-			isActive: false,
-			prevClicked: new Set()
+			isActive: false
 		}
+		console.log(filteredData[0])
 		console.log("showProteins clicked")
-		
-		drawnData = objects.selectAll(".dot")
-			.data(filteredData)
-			.enter().append("circle")
-				.classed("dot", true)
-				.attr("r", 2)
-				.attr("transform", transform)
-				.on("mouseover", tip.show)
-				.on("mouseout", tip.hide)
-				.on("click", d => showSameProteins(d, clickData))
+		console.log(objects)
+		objects.selectAll(".dot")
+			.filter(function(p) {
+				filteredData[0]["protein"] !== p["protein"]
+			})
+			.attr("r", 0.25)
+		objects.selectAll(".dot")
+			.filter(function(p) { 
+				filteredData[0]["protein"] === p["protein"]
+			})
+			.transition().duration(1500).attr("r", 3)
 	}
 
 	function update() {
@@ -167,30 +168,7 @@ d3.chart.scatter = function() {
 				.on("mouseout", tip.hide)
 				.on("click", d => showSameProteins(d, clickData))
 
-		function showSameProteins(d, clickData) {
-			// hasn't been clicked before
-			if (!clickData.isActive) {
-				objects.selectAll(".dot")
-						.filter(p => d["protein"] !== p["protein"])
-						.attr("r", 0.25)
-				objects.selectAll(".dot")
-						.filter(p => d["protein"] === p["protein"])
-						.transition().duration(1500).attr("r", 3)
-				clickData.isActive = !clickData.isActive
-			} else { // has been clicked before
-				objects.selectAll(".dot")
-						.transition().duration(500)
-						.attr("r", 2)
-				clickData.isActive = !clickData.isActive
-			}
-		}
-
 		d3.select("#xAxis").on("click", change)
-		d3.select("#resetSelection").on("click", resetSelection)
-
-		function resetSelection() {
-			objects.selectAll(".dot").transition().duration(500).attr("r", 2)
-		}
 
 		// Reset zoom
 		function change() {
@@ -226,6 +204,29 @@ d3.chart.scatter = function() {
 
 	function transform(d) {
 		return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
+	}
+
+	function showSameProteins(d, clickData) {
+		// hasn't been clicked before
+		if (!clickData.isActive) {
+			objects.selectAll(".dot")
+					.filter(p => d["protein"] !== p["protein"])
+					.transition().duration(500)
+					.attr("r", 0.25)
+			objects.selectAll(".dot")
+					.filter(p => d["protein"] === p["protein"])
+					.transition().duration(1500).attr("r", 3)
+			clickData.isActive = !clickData.isActive
+		} else { // has been clicked before
+			objects.selectAll(".dot")
+					.transition().duration(500)
+					.attr("r", 2)
+			clickData.isActive = !clickData.isActive
+		}
+	}
+
+	chart.resetSelection = function() {
+		objects.selectAll(".dot").transition().duration(500).attr("r", 2)
 	}
 
 	//combination getter and setter for the data attribute of the global chart variable
