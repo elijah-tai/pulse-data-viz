@@ -5,12 +5,13 @@ if (!d3.chart) d3.chart = {}
 d3.chart.scatter = function() {
 	var g
 	var data
-	var rect
-	var xaxis
-	var yaxis
+
 	var drawnData
 	var clickData
 	var objects
+
+	var tip
+	
 	var margin = { top: 50, right: 30, bottom: 50, left: 50}
 	var width = scatterWidth - margin.left - margin.right,
 			height = scatterHeight - margin.top - margin.bottom
@@ -18,7 +19,9 @@ d3.chart.scatter = function() {
 	var xCat = "index",
 			xLabel = "protein number",
 			yCat = "probability",
-			yLabel = "probability"
+			yLabel = "probability",
+			xScale,
+			yScale
 
 	var dispatch = d3.dispatch(chart, "clicked")
 
@@ -26,7 +29,7 @@ d3.chart.scatter = function() {
 		g = container
 
 		// Build box for chart
-		rect = g.append("rect")
+		var	rect = g.append("rect")
 			.attr("width", width)
 			.attr("height", height)
 
@@ -36,6 +39,18 @@ d3.chart.scatter = function() {
 		g.append("g")
 			.classed("y axis", true)
 
+		// Initialize tooltip
+		tip = d3.tip()
+			.attr("class", "d3-tip")
+			.offset([-10, 0])
+			.html(
+				d => "transcript: " + d["transcript"] + "<br>" 
+				+ "protein: " + d["protein"] + "<br>" 
+				+ yCat + ": " + d[yCat]
+			)
+
+		g.call(tip)
+
 		update()
 	}
 
@@ -43,10 +58,21 @@ d3.chart.scatter = function() {
 	chart.showProteins = showProteins
 
 	function showProteins(filteredData) {
-		var clickData = {
-			isActive: false
+		clickData = {
+			isActive: false,
+			prevClicked: new Set()
 		}
 		console.log("showProteins clicked")
+		
+		drawnData = objects.selectAll(".dot")
+			.data(filteredData)
+			.enter().append("circle")
+				.classed("dot", true)
+				.attr("r", 2)
+				.attr("transform", transform)
+				.on("mouseover", tip.show)
+				.on("mouseout", tip.hide)
+				.on("click", d => showSameProteins(d, clickData))
 	}
 
 	function update() {
@@ -56,7 +82,7 @@ d3.chart.scatter = function() {
 				xMin = d3.min(data, d => d[xCat]),
 				xMin = xMin > 0 ? 0 : xMin
 
-		var xScale = d3.scale.linear().range([0, width]).nice()
+		xScale = d3.scale.linear().range([0, width]).nice()
 		xScale.domain([xMin, xMax])
 
 		var xAxis = d3.svg.axis()
@@ -80,7 +106,7 @@ d3.chart.scatter = function() {
 				yMin = d3.min(data, d => d[yCat]),
 				yMin = yMin > 0 ? 0 : yMin
 
-		var yScale = d3.scale.linear().range([height, 0])
+		yScale = d3.scale.linear().range([height, 0])
 		yScale.domain([yMin, yMax])
 
 		var yAxis = d3.svg.axis()
@@ -126,18 +152,6 @@ d3.chart.scatter = function() {
 			.attr("x2", 0)
 			.attr("y2", scatterHeight)
 
-		// Initialize tooltip
-		var tip = d3.tip()
-								.attr("class", "d3-tip")
-								.offset([-10, 0])
-								.html(
-									d => "transcript: " + d["transcript"] + "<br>" 
-									+ "protein: " + d["protein"] + "<br>" 
-									+ yCat + ": " + d[yCat]
-								)
-
-		g.call(tip)
-
 		clickData = {
 			isActive: false,
 			prevClicked: new Set()
@@ -154,13 +168,6 @@ d3.chart.scatter = function() {
 				.on("click", d => showSameProteins(d, clickData))
 
 		function showSameProteins(d, clickData) {
-
-			// if clickData set has clicked protein, then don't highlight
-			// if (clickData.prevClicked.has(d)) {
-			//   objects.selectAll(".dot")
-			//     .filter(p => d["protein"] )
-			// }
-
 			// hasn't been clicked before
 			if (!clickData.isActive) {
 				objects.selectAll(".dot")
@@ -215,12 +222,11 @@ d3.chart.scatter = function() {
 			g.selectAll(".dot")
 					.attr("transform", transform)
 		}
-
-		function transform(d) {
-			return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
-		}
 	}
 
+	function transform(d) {
+		return "translate(" + xScale(d[xCat]) + "," + yScale(d[yCat]) + ")"
+	}
 
 	//combination getter and setter for the data attribute of the global chart variable
 	chart.data = function(value) {

@@ -10,7 +10,8 @@ d3.chart.table = function() {
 			tableHeight = 500 - margin.top - margin.bottom
 
 	var clickData = {
-		prevClicked: new Set()
+		isActive: false,
+		prevClicked: null
 	}
 
 	var dispatch = d3.dispatch(chart, "clicked")
@@ -45,18 +46,29 @@ d3.chart.table = function() {
 
 		// When row clicked, dispatch data clicked
 		rows.on("click", function(d) {
+			console.log(clickData.prevClicked)
 			// if d not in previously clicked data, change colour
-			if (!clickData.prevClicked.has(d)) {
+			if (clickData.isActive == false) {
 				d3.select(this).style("background-color", "#ffff99")
-				clickData.prevClicked.add(d)
+				clickData.prevClicked = d3.select(this)
 				clickData.isActive = !clickData.isActive
 				dispatch.clicked([d])
 			}
-			else {
+			// clicked the same thing twice --> erase highlight
+			else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ == d3.select(this)[0][0].__data__)) {
 				d3.select(this).style("background-color", "#ffffff")
-				clickData.prevClicked.delete(d)
-				clickData.isActive = !clickData.isActive
+				clickData.prevClicked = d3.select(this)
+				clickData.isActive = false
 				dispatch.clicked([])
+			} 
+			// clicked again, but different thing --> erase highlight of old, highlight new
+			else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ != d3.select(this)[0][0].__data__)) {
+				console.log(d3.select(this))
+				clickData.prevClicked.style("background-color", "#ffffff")
+				d3.select(this).style("background-color", "#ffff99")
+				clickData.prevClicked = d3.select(this)
+				clickData.isActive = true
+				dispatch.clicked([d])
 			}
 		})
 

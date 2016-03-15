@@ -69,10 +69,10 @@
 				d3.csv(file_name, function(error, file_data) { Vis.data = file_data
 				// Build data array
 				Vis.data.forEach(function(d) {
-				  d.index = +d.index
-				  d.transcript = d.transcript
-				  d.protein = d.protein
-				  d.probability = +d.probability
+					d.index = +d.index
+					d.transcript = d.transcript
+					d.protein = d.protein
+					d.probability = +d.probability
 				})
 				createViz()
 			})
