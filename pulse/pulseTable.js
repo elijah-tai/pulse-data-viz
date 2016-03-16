@@ -2,9 +2,34 @@
 
 if (!d3.chart) d3.chart = {}
 
+var opts = {
+  lines: 11 // The number of lines to draw
+, length: 0 // The length of each line
+, width: 21 // The line thickness
+, radius: 9 // The radius of the inner circle
+, scale: .5 // Scales overall size of the spinner
+, corners: 0.7 // Corner roundness (0..1)
+, color: '#000' // #rgb or #rrggbb or array of colors
+, opacity: 0.2 // Opacity of the lines
+, rotate: 0 // The rotation offset
+, direction: 1 // 1: clockwise, -1: counterclockwise
+, speed: 1 // Rounds per second
+, trail: 62 // Afterglow percentage
+, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+, zIndex: 2e9 // The z-index (defaults to 2000000000)
+, className: 'spinner' // The CSS class to assign to the spinner
+, top: '46%' // Top position relative to parent
+, left: '50%' // Left position relative to parent
+, shadow: false // Whether to render a shadow
+, hwaccel: false // Whether to use hardware acceleration
+, position: 'absolute' // Element positioning
+}
+
 d3.chart.table = function() {
 	var g
 	var data
+	var target = document.getElementById("spinner")
+	var spinner
 	var margin = {top: 20, right: 30, bottom: 30, left: 40},
 			tableWidth = 600 - margin.left - margin.right,
 			tableHeight = 500 - margin.top - margin.bottom
@@ -46,6 +71,18 @@ d3.chart.table = function() {
 
 		function refreshTable(sortOn) {
 			console.log(sortOn)
+			function createSpinner() {
+				spinner = new Spinner(opts).spin(target)
+			}
+
+			function handleClick(d) {
+				spinner = new Spinner(opts).spin(target)
+				function makeTable(d) {
+					refreshTable(d)
+				}
+				makeTable(d)
+			}
+
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
 
@@ -55,7 +92,7 @@ d3.chart.table = function() {
 				.enter().append("th")
 				.attr("class", (d, i) => "header" + i)
 				.on("click", function(d, i) {
-					refreshTable(d)
+					handleClick(d)
 				})
 				.text(d => d)
 
@@ -110,7 +147,7 @@ d3.chart.table = function() {
 
 				rows.selectAll("td")
 					.select("text").text(String)
-
+				spinner.stop()
 				// rows.exit().remove()
 
 			}
