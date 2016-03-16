@@ -44,32 +44,6 @@ d3.chart.table = function() {
 		var previousSort = null
 		refreshTable(null)
 
-		// When row clicked, dispatch data clicked
-		rows.on("click", function(d) {
-			// if d not in previously clicked data, change colour
-			if (clickData.isActive == false) {
-				d3.select(this).style("background-color", "#ffff99")
-				clickData.prevClicked = d3.select(this)
-				clickData.isActive = !clickData.isActive
-				dispatch.clicked([d])
-			}
-			// clicked the same thing twice --> erase highlight
-			else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ == d3.select(this)[0][0].__data__)) {
-				d3.select(this).style("background-color", "#ffffff")
-				clickData.prevClicked = d3.select(this)
-				clickData.isActive = false
-				dispatch.clicked([])
-			} 
-			// clicked again, but different thing --> erase highlight of old, highlight new
-			else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ != d3.select(this)[0][0].__data__)) {
-				clickData.prevClicked.style("background-color", "#ffffff")
-				d3.select(this).style("background-color", "#ffff99")
-				clickData.prevClicked = d3.select(this)
-				clickData.isActive = true
-				dispatch.clicked([d])
-			}
-		})
-
 		function refreshTable(sortOn) {
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
@@ -135,6 +109,32 @@ d3.chart.table = function() {
 				rows.selectAll("td").select("text").text(String)
 
 			}
+
+			// When row clicked, dispatch data clicked
+			rows.on("click", function(d) {
+				// if d not in previously clicked data, change colour
+				if (clickData.isActive == false) {
+					d3.select(this).style("background-color", "#ffff99")
+					clickData.prevClicked = d3.select(this)
+					clickData.isActive = !clickData.isActive
+					dispatch.clicked([d])
+				}
+				// clicked the same thing twice --> erase highlight
+				else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ == d3.select(this)[0][0].__data__)) {
+					d3.select(this).style("background-color", "#ffffff")
+					clickData.prevClicked = d3.select(this)
+					clickData.isActive = false
+					dispatch.clicked([])
+				} 
+				// clicked again, but different thing --> erase highlight of old, highlight new
+				else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ != d3.select(this)[0][0].__data__)) {
+					clickData.prevClicked.style("background-color", "#ffffff")
+					d3.select(this).style("background-color", "#ffff99")
+					clickData.prevClicked = d3.select(this)
+					clickData.isActive = true
+					dispatch.clicked([d])
+				}
+			})			
 		}			
 
 		function sort(a, b, previousSort) {
