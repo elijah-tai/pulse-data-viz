@@ -41,10 +41,11 @@ d3.chart.table = function() {
 			probabilityFieldWidth = 70
 
 		var	fieldHeight = 30
-		var previousSort = null
+		var prevSort = null
 		refreshTable(null)
 
 		function refreshTable(sortOn) {
+			console.log(sortOn)
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
 
@@ -98,15 +99,19 @@ d3.chart.table = function() {
 				.attr("width", probabilityFieldWidth)
 
 			if (sortOn !== null) {
-				if (sortOn != previousSort) {
-					rows.sort((a, b) => sort(a[sortOn], b[sortOn], previousSort))
-					previousSort = sortOn
+				if (sortOn != prevSort) {
+					rows.sort((a, b) => sort(a, b, prevSort, sortOn))
+					prevSort = sortOn
 				}
 				else {
-					rows.sort((a, b) => sort(a[sortOn], b[sortOn], previousSort))
-					previousSort = null
+					rows.sort((a, b) => sort(a, b, prevSort, sortOn))
+					prevSort = null
 				}
-				rows.selectAll("td").select("text").text(String)
+
+				rows.selectAll("td")
+					.select("text").text(String)
+
+				// rows.exit().remove()
 
 			}
 
@@ -137,19 +142,41 @@ d3.chart.table = function() {
 			})			
 		}			
 
-		function sort(a, b, previousSort) {
-			if (typeof a == "string" && previousSort == null) {
-				return a.localeCompare(b)
-			} 
-			else if (typeof a == "string" && (previousSort == "transcript" || previousSort == "protein")) {
-				return b.localeCompare(a)
+		function sort(a, b, prevSort, sortOn) {
+			
+			if (prevSort == null) {
+				if (sortOn == "index" || sortOn == "probability") {
+					return a[sortOn] < b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
+				} else if (sortOn == "transcript" || sortOn == "protein") {
+					return a[sortOn].localeCompare(b[sortOn])
+				}
+			} else if ((prevSort == "index" && sortOn == "index") || (prevSort == "probability" && sortOn == "probability")) {
+				return a[sortOn] > b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
+			} else if ((prevSort == "transcript" && sortOn == "transcript") || (prevSort == "protein" && sortOn == "protein")) {
+				return b[sortOn].localeCompare(a[sortOn])
+			} else {
+				if (typeof a[sortOn] == "string") {
+					return a[sortOn].localeCompare(b[sortOn])
+				} else if (typeof a[sortOn] == "number") {
+					return a[sortOn] > b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
+				}
 			}
-			else if (typeof a == "number" && previousSort == null) {
-				return a > b ? 1 : a == b ? 0 : -1
-			}
-			else if (typeof a == "number" && (previousSort == "index" || previousSort == "probability")) {
-				return b > a ? 1 : a == b ? 0 : -1
-			}
+			// if (sortOn == "index" && )
+			// if (a && prevSort == null) {
+			// 	return a.localeCompare(b)
+			// }
+			// // if sorting on number and haven't sorted before
+			// else if (typeof a == "number" && prevSort == null) {
+			// 	return a < b ? 1 : a == b ? 0 : -1
+			// }
+			// // if sorting on string and previously sorted on proteins
+			// else if (typeof a == "string" && (prevSort == "transcript" || prevSort == "protein")) {
+			// 	return b.localeCompare(a)
+			// }
+
+			// else if (typeof a == "number" && (prevSort == "index" || prevSort == "probability")) {
+			// 	return a > b ? 1 : a == b ? 0 : -1
+			// }
 		}
 
 	}
