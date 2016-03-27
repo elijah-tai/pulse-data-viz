@@ -4,6 +4,12 @@
 	margin: 0 auto;
 }
 
+.header {
+	text-align: center;
+	margin-left: 25%;
+	margin-right: 25%;
+}
+
 #scatter {
 	width: 700px;
 	height: 500px;

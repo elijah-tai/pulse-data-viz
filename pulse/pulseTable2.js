@@ -29,9 +29,7 @@ d3.chart.table2 = function() {
 	}
 
 	function showSameProteins(d) {
-		console.log(d)
 		data = data.filter(p => d["protein"] === p["protein"])
-		console.log(data)
 		chart.refreshTable(null)
 	}
 
