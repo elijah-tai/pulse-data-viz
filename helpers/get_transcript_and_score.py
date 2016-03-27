@@ -162,6 +162,7 @@ def merge_pfam_and_elm(elm_list, pfam_list):
                                     data[5], data[6], data[7], data[8],
                                     data[9], data[10], data[11], data[12],
                                     data[13], data[14]]
+    print(merged_dict)
     return merged_dict
 
 
@@ -187,19 +188,52 @@ if __name__ == "__main__":
     with open('data/protein_to_score.txt', 'w') as f:
         # Change this between protein_to_score || transcript_to_score
         count = 1
-        f.write("index,transcript,protein,probability\n")
+        f.write("index,transcript,protein,probability,\n")
         for triplet in transcript_to_protein_to_score_sorted_by_score:
             f.write("{},{},{},".format(count, triplet[0], triplet[1]))
             f.write("{0:.5f}\n".format(float(triplet[2])))
             count = count + 1
 
+    # index/category:
+    # 0/<seq id>
+    # 1/transcript
+    # 2/protein
+    # 3/elm_1
+    # 4/elm_2
+    # 5/elm_3
+    # 6/elm_4
+    # 7/<alignment start> 
+    # 8/<alignment end>
+    # 9/<envelope start> 
+    # 10/<envelope end>
+    # 11/<hmm acc>
+    # 12/<hmm name> 
+    # 13/<type>
+    # 14/<hmm start>
+    # 15/<hmm end>
+    # 16/<hmm length> 
+    # 17/<bit score>
+    # 18/<E-value>
+    # 19/<significance>
+    # 20/<clan>
+
     with open('data/seqid_to_pfam_and_elm.txt', 'w') as f:
-        f.write("seq_id,transcript,protein,elm_1,elm_2,elm_3,elm_4\n")
+        f.write("transcript,seq_id,protein,elm_1,elm_2,elm_3,elm_4,hmm_acc,hmm_name,type,e_value,significance,clan\n")
         for k, v in merged_pfam_and_elm.items():
-            f.write("{},{},{},".format(k, v[0], v[1]))
+            no_transcript = k.split(";")[1]
+            chromosome_start_end_else = no_transcript.split("_")
+            all_else = k.split("-")[1]
+            k = chromosome_start_end_else[0] + "_" + chromosome_start_end_else[1] + "_" + chromosome_start_end_else[2]
+
+            f.write("{},{},{},".format(v[0], k, v[1]))
             f.write("{0:.3f},".format(float(v[2])))
             f.write("{0:.3f},".format(float(v[3])))
             f.write("{0:.3f},".format(float(v[4])))
-            f.write("{0:.3f}\n".format(float(v[5])))
+            f.write("{0:.3f}".format(float(v[5])))
+            try:
+                f.write(",{},{},{},{},{},{}\n".format(
+                    v[10], v[11], v[12], v[17], v[18], v[19]))
+            except IndexError:
+                f.write("\n")
 
 

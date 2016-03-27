@@ -7,6 +7,8 @@
 		<link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
 		<link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
 		<link rel="stylesheet" href="assets/css/pulseTable2.css" charset="utf-8">
+		<link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+
 		<script src="d3/d3.v3.js" charset="utf-8"></script>
 		<script src="d3/d3.tip.v0.6.3.js"></script>
 	</head>
@@ -14,6 +16,7 @@
 		<script src="pulse/pulseTable.js" charset="utf-8"></script>
 		<script src="pulse/pulseScatter.js" charset="utf-8"></script>
 		<script src="pulse/pulseTable2.js" charset="utf-8"></script>
+
 		<div class="projects">
 			<h1>PULSE Data Visualization</h1>
 			<div id="scatter"></div>
@@ -70,7 +73,8 @@
 				// Scatter-table coordination goes here
 				table.on("clicked", function(filtered) {
 					scatter.showProteins(filtered)
-					table2.showTranscripts(filtered)
+					table2.showProteins(filtered)
+					table2.data(Vis.data2)
 				})
 
 				// scatter.on("click", clicked =>
@@ -96,13 +100,19 @@
 						Vis.data2 = file_data
 						// Build data array for seqid_to_pfam_and_elm
 						Vis.data2.forEach(function(d) {
-							d.seq_id = d.seq_id
 							d.transcript = d.transcript
+							d.seq_id = d.seq_id
 							d.protein = d.protein
 							d.elm_1 = +d.elm_1
 							d.elm_2 = +d.elm_2
 							d.elm_3 = +d.elm_3
 							d.elm_4 = +d.elm_4
+							d.hmm_acc = d.hmm_acc
+							d.hmm_name = d.hmm_name
+							d.type = d.type
+							d.e_value = d.e_value
+							d.significance = +d.significance
+							d.clan = d.clan
 						})
 						createViz()
 					})

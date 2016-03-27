@@ -6,8 +6,8 @@ d3.chart.table2 = function() {
 	var g
 	var data
 	var margin = {top: 20, right: 30, bottom: 30, left: 40},
-			tableWidth = 900 - margin.left - margin.right,
-			tableHeight = 500 - margin.top - margin.bottom
+			tableWidth = 1000 - margin.left - margin.right,
+			tableHeight = 300 - margin.top - margin.bottom
 
 	var clickData = {
 		isActive: false,
@@ -22,10 +22,17 @@ d3.chart.table2 = function() {
 	}
 
 	chart.update = update
-	chart.showTranscripts = showTranscripts
-	
-	function showTranscripts(d) {
+	chart.showProteins = showProteins
+
+	function showProteins(filteredData) {
+		showSameProteins(filteredData[0])
+	}
+
+	function showSameProteins(d) {
 		console.log(d)
+		data = data.filter(p => d["protein"] === p["protein"])
+		console.log(data)
+		chart.refreshTable(null)
 	}
 
 	function update() {
@@ -44,6 +51,8 @@ d3.chart.table2 = function() {
 		var prevSort = null
 		refreshTable(null)
 
+		chart.refreshTable = refreshTable
+
 		function refreshTable(sortOn) {
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
@@ -53,9 +62,6 @@ d3.chart.table2 = function() {
 				.data(d3.keys(data[0]))
 				.enter().append("th")
 				.attr("class", (d, i) => "header" + i)
-				.on("click", function(d, i) {
-					refreshTable(d)
-				})
 				.text(d => d)
 
 			// start filling the table
@@ -75,23 +81,22 @@ d3.chart.table2 = function() {
 		}			
 
 		function resizeWidths() {
-			var seqIdFieldWidth = 350,
-				transcriptFieldWidth = 140,
-				proteinFieldWidth = 105,
-				probabilityFieldWidth = 70,
-				elmFieldWidth = 70
+			var seqIdFieldWidth = 185,
+				transcriptFieldWidth = 105,
+				proteinFieldWidth = 80,
+				elmFieldWidth = 10
 
 			// Column 0
 			headerGrp.selectAll(".header0")
-				.attr("width", seqIdFieldWidth)
+				.attr("width", transcriptFieldWidth)
 			rowsGrp.selectAll(".cell0")
-				.attr("width", seqIdFieldWidth)
+				.attr("width", transcriptFieldWidth)
 
 			// Column 1
 			headerGrp.selectAll(".header1")
-				.attr("width", transcriptFieldWidth)
+				.attr("width", seqIdFieldWidth)
 			rowsGrp.selectAll(".cell1")
-				.attr("width", transcriptFieldWidth)
+				.attr("width", seqIdFieldWidth)
 
 			// Column 2
 			headerGrp.selectAll(".header2")
@@ -121,6 +126,42 @@ d3.chart.table2 = function() {
 			headerGrp.selectAll(".header6")
 				.attr("width", elmFieldWidth)
 			rowsGrp.selectAll(".cell6")
+				.attr("width", elmFieldWidth)
+
+			// Column 7
+			headerGrp.selectAll(".header7")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell7")
+				.attr("width", elmFieldWidth)
+
+			// Column 8
+			headerGrp.selectAll(".header8")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell8")
+				.attr("width", elmFieldWidth)
+
+			// Column 9
+			headerGrp.selectAll(".header9")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell9")
+				.attr("width", elmFieldWidth)
+
+			// Column 10
+			headerGrp.selectAll(".header10")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell10")
+				.attr("width", elmFieldWidth)
+
+			// Column 11
+			headerGrp.selectAll(".header11")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell11")
+				.attr("width", elmFieldWidth)
+
+			// Column 12
+			headerGrp.selectAll(".header12")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell12")
 				.attr("width", elmFieldWidth)
 		}
 
