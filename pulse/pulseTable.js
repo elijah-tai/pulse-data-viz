@@ -35,11 +35,6 @@ d3.chart.table = function() {
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 		var rows, cells
 
-		var indexFieldWidth = 60,
-			transcriptFieldWidth = 140,
-			proteinFieldWidth = 105,
-			probabilityFieldWidth = 70
-
 		var	fieldHeight = 30
 		var prevSort = null
 		refreshTable(null)
@@ -72,31 +67,7 @@ d3.chart.table = function() {
 				.append("text")
 				.text(d => d)
 
-			// Let's reformat some of the columns by index value
-			// Might be best to move this CSS
-			// Column 0
-			headerGrp.selectAll(".header0")
-				.attr("width", indexFieldWidth)
-			rowsGrp.selectAll(".cell0")
-				.attr("width", indexFieldWidth)
-
-			// Column 1
-			headerGrp.selectAll(".header1")
-				.attr("width", transcriptFieldWidth)
-			rowsGrp.selectAll(".cell1")
-				.attr("width", transcriptFieldWidth)
-
-			// Column 2
-			headerGrp.selectAll(".header2")
-				.attr("width", proteinFieldWidth)
-			rowsGrp.selectAll(".cell2")
-				.attr("width", proteinFieldWidth)
-
-			// Column 3
-			headerGrp.selectAll(".header3")
-				.attr("width", probabilityFieldWidth)
-			rowsGrp.selectAll(".cell3")
-				.attr("width", probabilityFieldWidth)
+			resizeWidths()
 
 			if (sortOn !== null) {
 				if (sortOn != prevSort) {
@@ -139,7 +110,7 @@ d3.chart.table = function() {
 					clickData.isActive = true
 					dispatch.clicked([d])
 				}
-			})			
+			})		
 		}			
 
 		function sort(a, b, prevSort, sortOn) {
@@ -161,6 +132,37 @@ d3.chart.table = function() {
 					return a[sortOn] > b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
 				}
 			}
+		}
+
+		function resizeWidths() {
+			var indexFieldWidth = 60,
+					transcriptFieldWidth = 140,
+					proteinFieldWidth = 105,
+					probabilityFieldWidth = 70
+
+			// Column 0
+			headerGrp.selectAll(".header0")
+				.attr("width", indexFieldWidth)
+			rowsGrp.selectAll(".cell0")
+				.attr("width", indexFieldWidth)
+
+			// Column 1
+			headerGrp.selectAll(".header1")
+				.attr("width", transcriptFieldWidth)
+			rowsGrp.selectAll(".cell1")
+				.attr("width", transcriptFieldWidth)
+
+			// Column 2
+			headerGrp.selectAll(".header2")
+				.attr("width", proteinFieldWidth)
+			rowsGrp.selectAll(".cell2")
+				.attr("width", proteinFieldWidth)
+
+			// Column 3
+			headerGrp.selectAll(".header3")
+				.attr("width", probabilityFieldWidth)
+			rowsGrp.selectAll(".cell3")
+				.attr("width", probabilityFieldWidth)
 		}
 
 	}

@@ -1,9 +1,9 @@
 .table-scroll-2 {
 	height: 400px;
-	width: 1000px;
+	width: 950px;
 	overflow: scroll;
 }
 
-.cell0, .cell1, .cell2 {
+.cell0, .cell1, .cell2, .cell3, .cell4, .cell5, .cell6 {
 	text-align: center;
 }

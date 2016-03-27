@@ -22,6 +22,11 @@ d3.chart.table2 = function() {
 	}
 
 	chart.update = update
+	chart.showTranscripts = showTranscripts
+	
+	function showTranscripts(d) {
+		console.log(d)
+	}
 
 	function update() {
 		var table = g.attr("width", tableWidth + margin.left + margin.right)
@@ -34,12 +39,6 @@ d3.chart.table2 = function() {
 			.attr("width", tableWidth)
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 		var rows, cells
-
-		var seqIdFieldWidth = 150,
-			transcriptFieldWidth = 140,
-			proteinFieldWidth = 105,
-			probabilityFieldWidth = 70,
-			elmFieldWidth = 70
 
 		var	fieldHeight = 30
 		var prevSort = null
@@ -72,8 +71,16 @@ d3.chart.table2 = function() {
 				.append("text")
 				.text(d => d)
 
-			// Let's reformat some of the columns by index value
-			// Might be best to move this CSS
+			resizeWidths()
+		}			
+
+		function resizeWidths() {
+			var seqIdFieldWidth = 350,
+				transcriptFieldWidth = 140,
+				proteinFieldWidth = 105,
+				probabilityFieldWidth = 70,
+				elmFieldWidth = 70
+
 			// Column 0
 			headerGrp.selectAll(".header0")
 				.attr("width", seqIdFieldWidth)
@@ -115,28 +122,6 @@ d3.chart.table2 = function() {
 				.attr("width", elmFieldWidth)
 			rowsGrp.selectAll(".cell6")
 				.attr("width", elmFieldWidth)
-		
-		}			
-
-		function sort(a, b, prevSort, sortOn) {
-			
-			if (prevSort == null) {
-				if (sortOn == "index" || sortOn == "probability") {
-					return a[sortOn] < b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
-				} else if (sortOn == "transcript" || sortOn == "protein") {
-					return a[sortOn].localeCompare(b[sortOn])
-				}
-			} else if ((prevSort == "index" && sortOn == "index") || (prevSort == "probability" && sortOn == "probability")) {
-				return a[sortOn] > b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
-			} else if ((prevSort == "transcript" && sortOn == "transcript") || (prevSort == "protein" && sortOn == "protein")) {
-				return b[sortOn].localeCompare(a[sortOn])
-			} else {
-				if (typeof a[sortOn] == "string") {
-					return a[sortOn].localeCompare(b[sortOn])
-				} else if (typeof a[sortOn] == "number") {
-					return a[sortOn] > b[sortOn] ? 1 : a[sortOn] == b[sortOn] ? 0 : -1
-				}
-			}
 		}
 
 	}
