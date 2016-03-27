@@ -6,34 +6,37 @@
 		<link rel="stylesheet" href="assets/css/main.css" charset="utf-8">
 		<link rel="stylesheet" href="assets/css/pulseScatter.css" charset="utf-8">
 		<link rel="stylesheet" href="assets/css/pulseTable.css" charset="utf-8">
+		<link rel="stylesheet" href="assets/css/pulseTable2.css" charset="utf-8">
 		<script src="d3/d3.v3.js" charset="utf-8"></script>
 		<script src="d3/d3.tip.v0.6.3.js"></script>
 	</head>
 	<body>
 		<script src="pulse/pulseTable.js" charset="utf-8"></script>
 		<script src="pulse/pulseScatter.js" charset="utf-8"></script>
-
+		<script src="pulse/pulseTable2.js" charset="utf-8"></script>
 		<div class="projects">
 			<h1>PULSE Data Visualization</h1>
 			<div id="scatter"></div>
 			<div id="table"></div>
+
 			<button id="xAxis" type="button" class="btn btn-primary" name="xAxis">Reset Zoom</button>
 			<button id="resetSelection" type="button" name="resetSelection">Reset Selection</button>
+			<div id="pfam-elm-table"></div>
 		</div>
 		
-
 		<script>
 			var Vis = {}
-			Vis.data = new Array()
+			Vis.data1 = new Array()
+			Vis.data2 = new Array()
 			var data
-			var csvFile = "data/protein_to_score.txt"
+
+			var protein_to_score = "data/protein_to_score.txt"
+			var seqid_to_pfam_and_elm = "data/seqid_to_pfam_and_elm.txt"
 			
 			var scatterWidth = 700,
 				scatterHeight = 500
 			var scatterMargin = { top: 50, right: 30, bottom: 50, left: 50}
 			
-
-
 			function createViz() {
 				// Create scatter plot group
 				var sgroup = d3.select("#scatter")
@@ -43,14 +46,20 @@
 								.append("g")
 									.attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")")
 				var scatter = d3.chart.scatter()
-				scatter.data(Vis.data)
+				scatter.data(Vis.data1)
 				scatter(sgroup)
 
 				// Create table group
 				var tableGroup = d3.select("#table")
 				var table = d3.chart.table()
-				table.data(Vis.data)
+				table.data(Vis.data1)
 				table(tableGroup)
+
+				// create secondary table for pfam and elm
+				var tableGroup2 = d3.select("#pfam-elm-table")
+				var table2 = d3.chart.table2()
+				table2.data(Vis.data2)
+				table2(tableGroup2)
 
 				var resetButton = d3.select("#resetSelection")
 					.on("click", function() {
@@ -70,20 +79,38 @@
 				//     scatter.update()
 				// })
 			}
-			function loadCsv(file_name) {
-				d3.csv(file_name, function(error, file_data) { Vis.data = file_data
-				// Build data array
-				Vis.data.forEach(function(d) {
-					d.index = +d.index
-					d.transcript = d.transcript
-					d.protein = d.protein
-					d.probability = +d.probability
+
+			function loadCsvs(protein_to_score, seqid_to_pfam_and_elm) {
+				d3.csv(protein_to_score, function(error, file_data) { 
+					Vis.data1 = file_data
+					// Build data array for protein_to_score
+					Vis.data1.forEach(function(d) {
+						// console.log(d)
+						d.index = +d.index
+						d.transcript = d.transcript
+						d.protein = d.protein
+						d.probability = +d.probability
+					})
+					d3.csv(seqid_to_pfam_and_elm, function(error, file_data) {
+						Vis.data2 = file_data
+						// Build data array for seqid_to_pfam_and_elm
+						Vis.data2.forEach(function(d) {
+							d.seq_id = d.seq_id
+							d.transcript = d.transcript
+							d.protein = d.protein
+							d.elm_1 = +d.elm_1
+							d.elm_2 = +d.elm_2
+							d.elm_3 = +d.elm_3
+							d.elm_4 = +d.elm_4
+						})
+						createViz()
+					})
 				})
-				createViz()
-			})
 			}
+
 			// Load CSV --> create viz
-			loadCsv(csvFile)
+			loadCsvs(protein_to_score, seqid_to_pfam_and_elm)
+
 		</script>
 
 	</body>

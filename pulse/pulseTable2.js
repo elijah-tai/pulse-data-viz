@@ -2,11 +2,11 @@
 
 if (!d3.chart) d3.chart = {}
 
-d3.chart.table = function() {
+d3.chart.table2 = function() {
 	var g
 	var data
 	var margin = {top: 20, right: 30, bottom: 30, left: 40},
-			tableWidth = 600 - margin.left - margin.right,
+			tableWidth = 900 - margin.left - margin.right,
 			tableHeight = 500 - margin.top - margin.bottom
 
 	var clickData = {
@@ -30,22 +30,22 @@ d3.chart.table = function() {
 		var headerGrp = table.append("table").attr("class", "headerGrp")
 		var headerRow = headerGrp.append("thead")
 
-		var rowsDiv = table.append("div").attr("class", "table-scroll-1")
+		var rowsDiv = table.append("div").attr("class", "table-scroll-2")
 			.attr("width", tableWidth)
 		var rowsGrp = rowsDiv.append("table").attr("class", "rowsGrp")
 		var rows, cells
 
-		var indexFieldWidth = 60,
+		var seqIdFieldWidth = 150,
 			transcriptFieldWidth = 140,
 			proteinFieldWidth = 105,
-			probabilityFieldWidth = 70
+			probabilityFieldWidth = 70,
+			elmFieldWidth = 70
 
 		var	fieldHeight = 30
 		var prevSort = null
 		refreshTable(null)
 
 		function refreshTable(sortOn) {
-			console.log(sortOn)
 			table.selectAll("th").remove()
 			table.selectAll("tr").remove()
 
@@ -76,9 +76,9 @@ d3.chart.table = function() {
 			// Might be best to move this CSS
 			// Column 0
 			headerGrp.selectAll(".header0")
-				.attr("width", indexFieldWidth)
+				.attr("width", seqIdFieldWidth)
 			rowsGrp.selectAll(".cell0")
-				.attr("width", indexFieldWidth)
+				.attr("width", seqIdFieldWidth)
 
 			// Column 1
 			headerGrp.selectAll(".header1")
@@ -94,52 +94,28 @@ d3.chart.table = function() {
 
 			// Column 3
 			headerGrp.selectAll(".header3")
-				.attr("width", probabilityFieldWidth)
+				.attr("width", elmFieldWidth)
 			rowsGrp.selectAll(".cell3")
-				.attr("width", probabilityFieldWidth)
+				.attr("width", elmFieldWidth)
 
-			if (sortOn !== null) {
-				if (sortOn != prevSort) {
-					rows.sort((a, b) => sort(a, b, prevSort, sortOn))
-					prevSort = sortOn
-				}
-				else {
-					rows.sort((a, b) => sort(a, b, prevSort, sortOn))
-					prevSort = null
-				}
+			// Column 4
+			headerGrp.selectAll(".header4")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell4")
+				.attr("width", elmFieldWidth)
 
-				rows.selectAll("td")
-					.select("text").text(String)
+			// Column 5
+			headerGrp.selectAll(".header5")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell5")
+				.attr("width", elmFieldWidth)
 
-				// rows.exit().remove()
-
-			}
-
-			// When row clicked, dispatch data clicked
-			rows.on("click", function(d) {
-				// if d not in previously clicked data, change colour
-				if (clickData.isActive == false) {
-					d3.select(this).style("background-color", "#ffff99")
-					clickData.prevClicked = d3.select(this)
-					clickData.isActive = !clickData.isActive
-					dispatch.clicked([d])
-				}
-				// clicked the same thing twice --> erase highlight
-				else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ == d3.select(this)[0][0].__data__)) {
-					d3.select(this).style("background-color", "#ffffff")
-					clickData.prevClicked = d3.select(this)
-					clickData.isActive = false
-					dispatch.clicked([])
-				} 
-				// clicked again, but different thing --> erase highlight of old, highlight new
-				else if (clickData.isActive == true && (clickData.prevClicked[0][0].__data__ != d3.select(this)[0][0].__data__)) {
-					clickData.prevClicked.style("background-color", "#ffffff")
-					d3.select(this).style("background-color", "#ffff99")
-					clickData.prevClicked = d3.select(this)
-					clickData.isActive = true
-					dispatch.clicked([d])
-				}
-			})			
+			// Column 6
+			headerGrp.selectAll(".header6")
+				.attr("width", elmFieldWidth)
+			rowsGrp.selectAll(".cell6")
+				.attr("width", elmFieldWidth)
+		
 		}			
 
 		function sort(a, b, prevSort, sortOn) {
