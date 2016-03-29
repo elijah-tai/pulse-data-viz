@@ -1,5 +1,9 @@
-import os, sys, re
+import os
+import sys
+import re
+import json
 from string import*
+
 
 def init_elm_dict(elm_classes_file):
     """
@@ -37,29 +41,29 @@ def init_elm_dict(elm_classes_file):
     return elm_dict
 
 
-def motif(entry, seq, elm_dict, output_filename):
-    """
-    Carles' motif function.
-
+def motif(elm_json, entry, seq, elm_dict):
     """
 
+    """
     D = {}
+    # for each accession id in elm_dict, check if there 
+    # is a match in the sequence
     for i in elm_dict:
         regex = elm_dict[i][1]
         m = re.search(regex, seq)
+        # if match, add to dictionary
         if str(m) != "None":
             D[i] = [elm_dict[i][2], m.span()]
 
-    output = ''
-    result = open(output_filename, "a")
     for k, v in sorted(D.items(), key = lambda item:item[1]):
         if v[0] < 0.005:
-            output += elm_dict[k][0] + ' (' + str(v[0]) + ', ' + str(v[1]) + ') '
+            elm_json[entry]["elm"][elm_dict[k][0]] = {}
+            elm_json[entry]["elm"][elm_dict[k][0]]["probability"] = v[0]
+            elm_json[entry]["elm"][elm_dict[k][0]]["coordinates"] = v[1]
+    return elm_json
 
-    print >> result, entry, "\t",output, "\t"
 
-
-def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, output_filename):
+def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary):
     """
     Read the protein sequence of isoforms, and get motif.
 
@@ -67,17 +71,38 @@ def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, o
     with open(protein_sequence_file, "r") as f:
         data = f.readlines()
 
+    result_json = {}
+
     for i in range(len(data)):
+        print(i)
         if ">" in data[i]:
             entry = data[i].strip()
             entry = entry.replace(">", "")
             entry = "DIS_"+entry.strip()
             seq = data[i+1].strip()
-            motif(entry, seq, elm_dictionary, output_filename)
+            result_json[entry] = {"elm": {}}
+            result_json = motif(result_json, entry, seq, elm_dictionary)
+    return result_json
+
+
+def add_pfam_to_result_json(result_json, pfam_file):
+    """
+    Adds the pfam data to resulting json at {transcriptID: "pfam": {...}}
+
+    """
+
+    return result_json
 
 
 if __name__ == "__main__":
     print("Building elm_dict\n")
     elm_dict = init_elm_dict("data/elm_classes.tsv")
-    print("reading protein sequence file and getting motif")
-    read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict, "data/disorderome_motifs_nofilter.txt")
+
+    print("reading protein sequence file and getting motif\n")
+    elm_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict)
+    final_json = add_pfam_to_result_json(elm_json, "data/seqid_to_pfam_elm.out")
+
+    print("writing to json file now")
+    # write json to file now
+    with open("data/disorderome_motifs_nofilter.json", "w") as outfile:
+        json.dump(elm_json, outfile, ensure_ascii=False)
