@@ -199,29 +199,6 @@ if __name__ == "__main__":
                 f.write("{},{},{},".format(count, triplet[0], triplet[1]))
                 f.write("{0:.5f}".format(float(triplet[2])))
 
-    # index/category:
-    # 0/<seq id>
-    # 1/transcript
-    # 2/protein
-    # 3/elm_1
-    # 4/elm_2
-    # 5/elm_3
-    # 6/elm_4
-    # 7/<alignment start> 
-    # 8/<alignment end>
-    # 9/<envelope start> 
-    # 10/<envelope end>
-    # 11/<hmm acc>
-    # 12/<hmm name> 
-    # 13/<type>
-    # 14/<hmm start>
-    # 15/<hmm end>
-    # 16/<hmm length> 
-    # 17/<bit score>
-    # 18/<E-value>
-    # 19/<significance>
-    # 20/<clan>
-
     with open('data/seqid_to_pfam_and_elm.txt', 'w') as f:
         count = 1
         last = len(merged_pfam_and_elm)

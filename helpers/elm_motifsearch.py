@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import json
+import get_transcript_and_score
 from string import*
 
 
@@ -41,9 +42,9 @@ def init_elm_dict(elm_classes_file):
     return elm_dict
 
 
-def motif(elm_json, entry, seq, elm_dict):
+def find_motif_for_entry(elm_json, entry, seq, elm_dict):
     """
-
+    Finds regex motif for entry given its protein sequence.
     """
     D = {}
     # for each accession id in elm_dict, check if there 
@@ -57,9 +58,9 @@ def motif(elm_json, entry, seq, elm_dict):
 
     for k, v in sorted(D.items(), key = lambda item:item[1]):
         if v[0] < 0.005:
-            elm_json[entry]["elm"][elm_dict[k][0]] = {}
-            elm_json[entry]["elm"][elm_dict[k][0]]["probability"] = v[0]
-            elm_json[entry]["elm"][elm_dict[k][0]]["coordinates"] = v[1]
+            elm_json[entry]["ELM"][elm_dict[k][0]] = {}
+            elm_json[entry]["ELM"][elm_dict[k][0]]["probability"] = v[0]
+            elm_json[entry]["ELM"][elm_dict[k][0]]["coordinates"] = v[1]
     return elm_json
 
 
@@ -78,31 +79,34 @@ def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary):
         if ">" in data[i]:
             entry = data[i].strip()
             entry = entry.replace(">", "")
-            entry = "DIS_"+entry.strip()
             seq = data[i+1].strip()
-            result_json[entry] = {"elm": {}}
-            result_json = motif(result_json, entry, seq, elm_dictionary)
+            result_json[entry] = {"ELM": {}}
+            result_json = find_motif_for_entry(result_json, entry, seq, elm_dictionary)
     return result_json
 
 
-def add_pfam_to_result_json(result_json, pfam_file):
+def add_pfam_coords(result_json, pfam_file):
     """
     Adds the pfam data to resulting json at {transcriptID: "pfam": {...}}
 
     """
-
+    pfam_list = get_transcript_and_score.get_pfam(pfam_file)
+    for i in pfam_list:
+        try:
+            entry = i[0]
+            result_json[entry]["PFAM"] = {}
+            result_json[entry]["PFAM"][i[5]] = {"coordinates": (int(i[1]), int(i[2]))}
+        except KeyError as e:
+            print(e)
     return result_json
 
 
 if __name__ == "__main__":
-    print("Building elm_dict\n")
     elm_dict = init_elm_dict("data/elm_classes.tsv")
-
-    print("reading protein sequence file and getting motif\n")
     elm_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict)
-    final_json = add_pfam_to_result_json(elm_json, "data/seqid_to_pfam_elm.out")
 
-    print("writing to json file now")
-    # write json to file now
+    print(elm_json)
+    final_json = add_pfam_coords(elm_json, "data/pfam_done.txt")
+    
     with open("data/disorderome_motifs_nofilter.json", "w") as outfile:
-        json.dump(elm_json, outfile, ensure_ascii=False)
+        json.dump(final_json, outfile, ensure_ascii=False)
