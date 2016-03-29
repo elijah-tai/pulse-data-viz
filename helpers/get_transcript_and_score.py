@@ -188,11 +188,16 @@ if __name__ == "__main__":
     with open('data/protein_to_score.txt', 'w') as f:
         # Change this between protein_to_score || transcript_to_score
         count = 1
+        last = len(transcript_to_protein_to_score_sorted_by_score)
         f.write("index,transcript,protein,probability,\n")
         for triplet in transcript_to_protein_to_score_sorted_by_score:
-            f.write("{},{},{},".format(count, triplet[0], triplet[1]))
-            f.write("{0:.5f}\n".format(float(triplet[2])))
-            count = count + 1
+            if count != last:
+                f.write("{},{},{},".format(count, triplet[0], triplet[1]))
+                f.write("{0:.5f}\n".format(float(triplet[2])))
+                count = count + 1
+            else:
+                f.write("{},{},{},".format(count, triplet[0], triplet[1]))
+                f.write("{0:.5f}".format(float(triplet[2])))
 
     # index/category:
     # 0/<seq id>
@@ -218,6 +223,8 @@ if __name__ == "__main__":
     # 20/<clan>
 
     with open('data/seqid_to_pfam_and_elm.txt', 'w') as f:
+        count = 1
+        last = len(merged_pfam_and_elm)
         f.write("transcript,seq_id,protein,elm_1,elm_2,elm_3,elm_4,hmm_acc,hmm_name,type,e_value,significance,clan\n")
         for k, v in merged_pfam_and_elm.items():
             no_transcript = k.split(";")[1]
@@ -230,10 +237,17 @@ if __name__ == "__main__":
             f.write("{0:.3f},".format(float(v[3])))
             f.write("{0:.3f},".format(float(v[4])))
             f.write("{0:.3f}".format(float(v[5])))
-            try:
-                f.write(",{},{},{},{},{},{}\n".format(
-                    v[10], v[11], v[12], v[17], v[18], v[19]))
-            except IndexError:
-                f.write("\n")
-
+            if count != last:
+                try:
+                    f.write(",{},{},{},{},{},{}\n".format(
+                        v[10], v[11], v[12], v[17], v[18], v[19]))
+                except IndexError:
+                    f.write("\n")
+            else:
+                try:
+                    f.write(",{},{},{},{},{},{}".format(
+                        v[10], v[11], v[12], v[17], v[18], v[19]))
+                except IndexError:
+                    pass
+            count += 1
 

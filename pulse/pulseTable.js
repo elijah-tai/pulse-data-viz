@@ -37,6 +37,7 @@ d3.chart.table = function() {
 
 		var	fieldHeight = 30
 		var prevSort = null
+
 		refreshTable(null)
 
 		function refreshTable(sortOn) {
@@ -65,7 +66,12 @@ d3.chart.table = function() {
 				.enter().append("td")
 				.attr("class", (d, i) => "cell" + i)
 				.append("text")
-				.text(d => d)
+				.text(function (d) {
+					return d
+				})
+
+
+			console.log(data)
 
 			resizeWidths()
 
