@@ -70,9 +70,6 @@ d3.chart.table = function() {
 					return d
 				})
 
-
-			console.log(data)
-
 			resizeWidths()
 
 			if (sortOn !== null) {
