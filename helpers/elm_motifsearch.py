@@ -42,7 +42,7 @@ def init_elm_dict(elm_classes_file):
     return elm_dict
 
 
-def find_motif_for_entry(elm_json, entry, seq, elm_dict):
+def find_motif_for_entry(elm_json, entry, seq, elm_dict, index):
     """
     Finds regex motif for entry given its protein sequence.
     """
@@ -56,15 +56,18 @@ def find_motif_for_entry(elm_json, entry, seq, elm_dict):
         if str(m) != "None":
             D[i] = [elm_dict[i][2], m.span()]
 
+    elm_count = 0 # keeps track of where the current working elm is
     for k, v in sorted(D.items(), key = lambda item:item[1]):
         if v[0] < 0.005:
-            elm_json[entry]["ELM"][elm_dict[k][0]] = {}
-            elm_json[entry]["ELM"][elm_dict[k][0]]["probability"] = v[0]
-            elm_json[entry]["ELM"][elm_dict[k][0]]["coordinates"] = v[1]
+            elm_json[index]["elms"].append({"elm_id": elm_dict[k][0]})
+            elm_json[index]["elms"][elm_count]["probability"] = v[0]
+            elm_json[index]["elms"][elm_count]["start"] = v[1][0]
+            elm_json[index]["elms"][elm_count]["end"] = v[1][1]
+            elm_count += 1
     return elm_json
 
 
-def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary):
+def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, pfam_file):
     """
     Read the protein sequence of isoforms, and get motif.
 
@@ -72,41 +75,44 @@ def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary):
     with open(protein_sequence_file, "r") as f:
         data = f.readlines()
 
-    result_json = {}
+    result_json = []
 
+    count = 0 # keeps track of the current working entry
     for i in range(len(data)):
-        print(i)
         if ">" in data[i]:
+            print(count)
             entry = data[i].strip()
             entry = entry.replace(">", "")
             seq = data[i+1].strip()
-            result_json[entry] = {"ELM": {}}
-            result_json = find_motif_for_entry(result_json, entry, seq, elm_dictionary)
-    return result_json
+            result_json.append({"entry": entry})
+            result_json[count]["elms"] = []
+            result_json[count]["pfam"] = []
+            result_json = find_motif_for_entry(result_json, entry, seq, elm_dictionary, count)
+            final_json = add_pfam_coords(result_json, pfam_file, count)
+            count += 1
+    return final_json
 
 
-def add_pfam_coords(result_json, pfam_file):
+def add_pfam_coords(result_json, pfam_file, index):
     """
     Adds the pfam data to resulting json at {transcriptID: "pfam": {...}}
 
     """
+    pfam_count = 0
     pfam_list = get_transcript_and_score.get_pfam(pfam_file)
     for i in pfam_list:
-        try:
-            entry = i[0]
-            result_json[entry]["PFAM"] = {}
-            result_json[entry]["PFAM"][i[5]] = {"coordinates": (int(i[1]), int(i[2]))}
-        except KeyError as e:
-            print(e)
+        if result_json[index]["entry"] == i[0]:
+            # no pfams yet
+            result_json[index]["pfam"].append({"pfam_id": i[5]})
+            result_json[index]["pfam"][pfam_count]["start"] = int(i[1])
+            result_json[index]["pfam"][pfam_count]["end"] = int(i[2])
+
     return result_json
 
 
 if __name__ == "__main__":
     elm_dict = init_elm_dict("data/elm_classes.tsv")
-    elm_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict)
+    final_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict, "data/pfam_done.txt")
 
-    print(elm_json)
-    final_json = add_pfam_coords(elm_json, "data/pfam_done.txt")
-    
-    with open("data/disorderome_motifs_nofilter.json", "w") as outfile:
+    with open("data/elm_and_pfam_full.json", "w") as outfile:
         json.dump(final_json, outfile, ensure_ascii=False)
