@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Testing</title>
+		<script src="../d3/d3.v3.js" charset="utf-8"></script>
+		<script src="../d3/d3.tip.v0.6.3.js"></script>
+	</head>
+	<body>
+
+		<div class="projects">
+			<div id="test"></div>
+		</div>
+		
+		<script>
+			var w = 1000
+			var h = 700
+			data1 = new Array()
+			d3.json("../data/elm_and_pfam_full.json", function(error, file_data) {
+				var tgroup = d3.select("#test")
+					.append("svg")
+						.attr("width", w)
+						.attr("height", h)
+					.append("g")
+						.attr("transform", "translate(50, 50)")
+
+				data1 = file_data
+				data1.forEach(function(d) {
+					console.log(d)
+					d.entry = d.entry
+					d.pfam = d.pfam
+					d.elms = d.elms
+					d.start = +d.start
+					d.end = +d.end
+				})
+
+				tgroup.selectAll("rect")
+					.data(data1)
+					.enter()
+					.append("rect")
+					.attr("x", function(d) {
+						w / data1.length
+					})
+					.attr("y", (d, i) => (i * (h / data1.length)))
+					.attr("width", (d) => d.end - d.start)
+					.attr("fill", "rgb(0, 0, 0)")
+					.attr("height", h / data1.length)
+
+
+			})
+
+		</script>
+
+	</body>
+</html>

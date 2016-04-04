@@ -85,6 +85,9 @@ def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, p
             entry = entry.replace(">", "")
             seq = data[i+1].strip()
             result_json.append({"entry": entry})
+            split_entry = entry.split("_")
+            result_json[count]["start"] = split_entry[1]
+            result_json[count]["end"] = split_entry[2].split("-")[0]
             result_json[count]["elms"] = []
             result_json[count]["pfam"] = []
             result_json = find_motif_for_entry(result_json, entry, seq, elm_dictionary, count)
@@ -110,9 +113,32 @@ def add_pfam_coords(result_json, pfam_file, index):
     return result_json
 
 
+def find_min_max(final_json):
+    """
+    Finds the minimum and maximum values of start and end, respectively,
+    in final_json.
+    """
+    start_array = []
+    end_array = []
+
+    for i in range(len(final_json)):
+        start_array.append(final_json[i]["start"])
+        end_array.append(final_json[i]["end"])
+
+    min_start = min(start_array)
+    max_end = max(end_array)
+
+    return min_start, max_end
+
+
 if __name__ == "__main__":
     elm_dict = init_elm_dict("data/elm_classes.tsv")
     final_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict, "data/pfam_done.txt")
+
+    min_start, max_end = find_min_max(final_json)
+
+    print(min_start)
+    print(max_end)
 
     with open("data/elm_and_pfam_full.json", "w") as outfile:
         json.dump(final_json, outfile, ensure_ascii=False)
