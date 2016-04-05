@@ -34,32 +34,21 @@ d3.chart.table2 = function() {
 	}
 
 	function showSameProteins(d) {
-		data = data.filter(p => d["protein"] === p["protein"])
-		chart.refreshTable(null)
+		chart.refreshTable(d)
 	}
 
 	function update() {
-		svg.selectAll("rect")
-			.data(data)
-			.enter()
-			.append("rect")
-			.attr("x", function(d) {
-				return (tableWidth + margin.left + margin.right) / data.length
-			})
-			.attr("y", (d, i) => (i * (tableHeight / data.length)))
-			.attr("width", (d) => d.end - d.start)
-			.attr("fill", "rgb(0, 0, 0)")
-			.attr("height", "5")
-
 		var prevSort = null
 		refreshTable(null)
 		chart.refreshTable = refreshTable
 
 		function refreshTable(d) {
-			svg.selectAll("rect").remove()
 
-			data = data.filter(p => d["protein"] === p["protein"])
-
+			if (d != null) {
+				data = data.filter(p => d["protein"] === p["protein"])
+			}
+			
+			console.log(data)
 			svg.selectAll("rect")
 				.data(data)
 				.append("rect")
