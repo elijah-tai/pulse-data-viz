@@ -111,10 +111,9 @@
 						if (error) return console.warn(error)
 							
 						Vis.data2 = pfam_elm_data
-						console.log(Vis.data2)
+					
 						// Build data array for elm_and_pfam_full
 						Vis.data2.forEach(function(d) {
-							console.log(d.protein)
 							d.protein = d.protein
 							d.entry = d.entry
 							d.pfam = d.pfam
