@@ -53,6 +53,7 @@
 									.attr("height", scatterHeight)
 								.append("g")
 									.attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")")
+
 				var scatter = d3.chart.scatter()
 				scatter.data(Vis.data1)
 				scatter(sgroup)
@@ -93,7 +94,7 @@
 			/* 	
 				TODO: Use promises?
 			*/
-			function loadCsvs(protein_to_score, elm_and_pfam_full) {
+			function loadData(protein_to_score, elm_and_pfam_full) {
 				d3.csv(protein_to_score, function(error, file_data) { 
 					Vis.data1 = file_data
 					// Build data array for protein_to_score
@@ -107,8 +108,9 @@
 
 					console.log("protein to score loaded")
 
-					d3.json(elm_and_pfam_full, function(error, file_data) {
-						Vis.data2 = file_data
+					d3.json(elm_and_pfam_full, function(error, pfam_elm_data) {
+						Vis.data2 = pfam_elm_data
+						console.log(Vis.data2)
 
 						// Build data array for elm_and_pfam_full
 						Vis.data2.forEach(function(d) {
@@ -125,8 +127,7 @@
 				})
 			}
 
-			// Load CSV --> create viz
-			loadCsvs(protein_to_score, elm_and_pfam_full)
+			loadData(protein_to_score, elm_and_pfam_full)
 
 		</script>
 

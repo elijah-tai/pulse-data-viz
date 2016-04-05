@@ -67,7 +67,7 @@ def find_motif_for_entry(elm_json, entry, seq, elm_dict, index):
     return elm_json
 
 
-def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, pfam_file):
+def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, pfam_file, merged_pfam_and_elm):
     """
     Read the protein sequence of isoforms, and get motif.
 
@@ -86,6 +86,7 @@ def read_protein_sequence_and_get_motif(protein_sequence_file, elm_dictionary, p
             seq = data[i+1].strip()
             result_json.append({"entry": entry})
             split_entry = entry.split("_")
+            result_json[count]["protein"] = str(merged_pfam_and_elm[entry][1])
             result_json[count]["start"] = split_entry[1]
             result_json[count]["end"] = split_entry[2].split("-")[0]
             result_json[count]["elms"] = []
@@ -133,7 +134,12 @@ def find_min_max(final_json):
 
 if __name__ == "__main__":
     elm_dict = init_elm_dict("data/elm_classes.tsv")
-    final_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict, "data/pfam_done.txt")
+
+    pfam_list = get_transcript_and_score.get_pfam('data/pfam_done.txt')
+    elm_list = get_transcript_and_score.get_elm('data/elm_read.txt')
+    merged_pfam_and_elm = get_transcript_and_score.merge_pfam_and_elm(elm_list, pfam_list)
+    final_json = read_protein_sequence_and_get_motif("data/p_seq_isoforms.fas", elm_dict, "data/pfam_done.txt", merged_pfam_and_elm)
+    print(final_json)
 
     min_start, max_end = find_min_max(final_json)
 

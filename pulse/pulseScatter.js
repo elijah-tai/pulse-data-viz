@@ -29,7 +29,7 @@ d3.chart.scatter = function() {
 		g = container
 
 		// Build box for chart
-		var	rect = g.append("rect")
+		var	scatterRect = g.append("scatter-rect")
 			.attr("width", width)
 			.attr("height", height)
 
