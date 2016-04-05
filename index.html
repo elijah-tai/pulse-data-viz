@@ -37,11 +37,10 @@
 			var Vis = {}
 			Vis.data1 = new Array()
 			Vis.data2 = new Array()
-			var data
 
 			var protein_to_score = "data/protein_to_score.txt"
-			var seqid_to_pfam_and_elm = "data/seqid_to_pfam_and_elm.txt"
-			
+			var elm_and_pfam_full = "data/elm_and_pfam_full.json"
+
 			var scatterWidth = 700,
 				scatterHeight = 500
 			var scatterMargin = { top: 50, right: 30, bottom: 50, left: 50}
@@ -79,8 +78,8 @@
 				// Scatter-table coordination goes here
 				table.on("clicked", function(filtered) {
 					scatter.showProteins(filtered)
-					// table2.showProteins(filtered)
-					// table2.data(Vis.data2)
+					table2.showProteins(filtered)
+					table2.data(Vis.data2)
 				})
 
 				// scatter.on("click", clicked =>
@@ -91,7 +90,10 @@
 				// })
 			}
 
-			function loadCsvs(protein_to_score, seqid_to_pfam_and_elm) {
+			/* 	
+				TODO: Use promises?
+			*/
+			function loadCsvs(protein_to_score, elm_and_pfam_full) {
 				d3.csv(protein_to_score, function(error, file_data) { 
 					Vis.data1 = file_data
 					// Build data array for protein_to_score
@@ -102,31 +104,29 @@
 						d.protein = d.protein
 						d.probability = +d.probability
 					})
-					d3.csv(seqid_to_pfam_and_elm, function(error, file_data) {
+
+					console.log("protein to score loaded")
+
+					d3.json(elm_and_pfam_full, function(error, file_data) {
 						Vis.data2 = file_data
-						// Build data array for seqid_to_pfam_and_elm
+
+						// Build data array for elm_and_pfam_full
 						Vis.data2.forEach(function(d) {
-							d.transcript = d.transcript
-							d.seq_id = d.seq_id
-							d.protein = d.protein
-							d.elm_1 = +d.elm_1
-							d.elm_2 = +d.elm_2
-							d.elm_3 = +d.elm_3
-							d.elm_4 = +d.elm_4
-							d.hmm_acc = d.hmm_acc
-							d.hmm_name = d.hmm_name
-							d.type = d.type
-							d.e_value = d.e_value
-							d.significance = +d.significance
-							d.clan = d.clan
+							d.entry = d.entry
+							d.pfam = d.pfam
+							d.elms = d.elms
+							d.start = +d.start
+							d.end = +d.end
 						})
+
+						console.log("elm and pfam loaded")
 						createViz()
 					})
 				})
 			}
 
 			// Load CSV --> create viz
-			loadCsvs(protein_to_score, seqid_to_pfam_and_elm)
+			loadCsvs(protein_to_score, elm_and_pfam_full)
 
 		</script>
 

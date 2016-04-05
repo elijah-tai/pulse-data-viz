@@ -2,6 +2,18 @@
 
 if (!d3.chart) d3.chart = {}
 
+// tgroup.selectAll("rect")
+// 	.data(data1)
+// 	.enter()
+// 	.append("rect")
+// 	.attr("x", function(d) {
+// 		w / data1.length
+// 	})
+// 	.attr("y", (d, i) => (i * (h / data1.length)))
+// 	.attr("width", (d) => d.end - d.start)
+// 	.attr("fill", "rgb(0, 0, 0)")
+// 	.attr("height", h / data1.length)
+
 d3.chart.table2 = function() {
 	var g
 	var data
@@ -47,6 +59,7 @@ d3.chart.table2 = function() {
 
 		var	fieldHeight = 30
 		var prevSort = null
+
 		refreshTable(null)
 
 		chart.refreshTable = refreshTable
