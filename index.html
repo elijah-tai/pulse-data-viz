@@ -95,7 +95,8 @@
 				TODO: Use promises?
 			*/
 			function loadData(protein_to_score, elm_and_pfam_full) {
-				d3.csv(protein_to_score, function(error, file_data) { 
+				d3.csv(protein_to_score, function(error, file_data) {
+					if (error) return console.warn(error)
 					Vis.data1 = file_data
 					// Build data array for protein_to_score
 					Vis.data1.forEach(function(d) {
@@ -106,21 +107,21 @@
 						d.probability = +d.probability
 					})
 
-					console.log("protein to score loaded")
-
 					d3.json(elm_and_pfam_full, function(error, pfam_elm_data) {
+						if (error) return console.warn(error)
+							
 						Vis.data2 = pfam_elm_data
 						console.log(Vis.data2)
-
 						// Build data array for elm_and_pfam_full
 						Vis.data2.forEach(function(d) {
+							console.log(d.protein)
+							d.protein = d.protein
 							d.entry = d.entry
 							d.pfam = d.pfam
 							d.elms = d.elms
 							d.start = +d.start
 							d.end = +d.end
 						})
-
 						console.log("elm and pfam loaded")
 						createViz()
 					})
