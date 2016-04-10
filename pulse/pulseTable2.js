@@ -20,9 +20,6 @@ d3.chart.table2 = function() {
 
 	function chart(container) {
 		g = container
-		svg = g.append("svg")
-				.attr("width", tableWidth)
-				.attr("height", tableHeight)
 		update()
 	}
 
@@ -42,23 +39,28 @@ d3.chart.table2 = function() {
 		refreshTable(null)
 		chart.refreshTable = refreshTable
 
-		function refreshTable(d) {
+		console.log(data)
+		svg = g.append("svg")
+			.attr("width", tableWidth)
+			.attr("height", tableHeight)
 
-			if (d != null) {
-				data = data.filter(p => d["protein"] === p["protein"])
-			}
+		function refreshTable(d) {
 			
-			console.log(data)
-			svg.selectAll("rect")
-				.data(data)
-				.append("rect")
-				.attr("x", function(d) {
-					return (tableWidth + margin.left + margin.right) / data.length
-				})
-				.attr("y", (d, i) => (i * (tableHeight / data.length)))
-				.attr("width", (d) => d.end - d.start)
-				.attr("fill", "rgb(0, 0, 0)")
-				.attr("height", "5")
+			if (d != null) {
+				svg.selectAll("rect").remove()
+				data = data.filter(p => d["protein"] === p["protein"])
+				console.log(data)
+
+				svg.selectAll("rect")
+					.data(data)
+					.enter()
+					.append("rect")
+					.attr("x", (d) => 0)
+					.attr("y", (d, i) => (i * (tableHeight / data.length)))
+					.attr("width", (d) => d.end - d.start)
+					.attr("fill", "rgb(0, 0, 0)")
+					.attr("height", "5")
+			}
 		}
 	}
 
