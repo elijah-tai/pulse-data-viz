@@ -49,17 +49,25 @@ d3.chart.table2 = function() {
 			if (d != null) {
 				svg.selectAll("rect").remove()
 				data = data.filter(p => d["protein"] === p["protein"])
-				console.log(data)
+				// console.log(data)
 
+				// draw basic rectangle for protein
 				svg.selectAll("rect")
 					.data(data)
 					.enter()
 					.append("rect")
+					.attr("rx", 6)
+					.attr("ry", 6)
 					.attr("x", (d) => 0)
 					.attr("y", (d, i) => (i * (tableHeight / data.length)))
 					.attr("width", (d) => d.end - d.start)
 					.attr("fill", "rgb(0, 0, 0)")
 					.attr("height", "5")
+
+				// overlay pfam data in red
+
+				// overlay elm data in blue
+
 			}
 		}
 	}

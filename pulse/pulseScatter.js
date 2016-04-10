@@ -5,9 +5,11 @@ if (!d3.chart) d3.chart = {}
 d3.chart.scatter = function() {
 	var g
 	var data
-
 	var drawnData
-	var clickData
+	var clickData = {
+		// isActive: false,
+		prevClicked: null
+	}
 	var objects
 
 	var tip
@@ -58,9 +60,7 @@ d3.chart.scatter = function() {
 	chart.showProteins = showProteins
 
 	function showProteins(filteredData) {
-		clickData = {
-			isActive: false
-		}
+		clickData.prevClicked = filteredData
 		showSameProteins(filteredData[0], clickData)
 	}
 
@@ -87,7 +87,6 @@ d3.chart.scatter = function() {
 				.attr("x", width)
 				.attr("y", margin.bottom - 10)
 				.text(xLabel)
-
 
 		// y axis
 		var yMax = d3.max(data, d => d[yCat]) * 1.05,
@@ -141,11 +140,6 @@ d3.chart.scatter = function() {
 			.attr("x2", 0)
 			.attr("y2", scatterHeight)
 
-		clickData = {
-			isActive: false,
-			prevClicked: new Set()
-		}
-
 		drawnData = objects.selectAll(".dot")
 				.data(data)
 			.enter().append("circle")
@@ -196,9 +190,14 @@ d3.chart.scatter = function() {
 	}
 
 	function showSameProteins(d, clickData) {
-		console.log(d)
-		// hasn't been clicked before
-		if (!clickData.isActive) {
+		// clicking on the same thing, d passes in empty array
+		if (clickData.prevClicked[0] == null) {
+			drawnData
+					.transition().duration(500)
+					.attr("r", 2)
+		}
+		// clicking on a different thing
+		else if (clickData.prevClicked !== d) {
 			drawnData
 					.filter(p => d["protein"] !== p["protein"])
 					.transition().duration(250)
@@ -206,12 +205,7 @@ d3.chart.scatter = function() {
 			drawnData
 					.filter(p => d["protein"] === p["protein"])
 					.transition().duration(750).attr("r", 3)
-			clickData.isActive = !clickData.isActive
-		} else { // has been clicked before
-			drawnData
-					.transition().duration(500)
-					.attr("r", 2)
-			clickData.isActive = !clickData.isActive
+			clickData.prevClicked = null
 		}
 	}
 

@@ -1,4 +1,4 @@
-index,transcript,protein,probability,
+index,transcript,protein,probability
 1,ENST00000380816,Q7Z5P9,0.21100
 2,ENST00000420031,Q3BBV0,0.21310
 3,ENST00000435957,Q8IYW2,0.33410

@@ -188,7 +188,7 @@ if __name__ == "__main__":
         # Change this between protein_to_score || transcript_to_score
         count = 1
         last = len(transcript_to_protein_to_score_sorted_by_score)
-        f.write("index,transcript,protein,probability,\n")
+        f.write("index,transcript,protein,probability\n")
         for triplet in transcript_to_protein_to_score_sorted_by_score:
             if count != last:
                 f.write("{},{},{},".format(count, triplet[0], triplet[1]))
