@@ -90,7 +90,7 @@ def get_pfam(pulse_pfam_output_file):
 
 def get_elm(pulse_elm_output_file):
     """
-    Returns the dictionary of all of the elm data.
+    Returns a list of all of the elm data.
 
     index/category:
     0/seq id
@@ -101,7 +101,7 @@ def get_elm(pulse_elm_output_file):
     5/?
     
     :param pulse_elm_output_file
-    :return elm_dict
+    :return list_list
     """
     pulse_elm = open(pulse_elm_output_file, "r")
     elm_list = []
@@ -162,7 +162,6 @@ def merge_pfam_and_elm(elm_list, pfam_list):
                                     data[5], data[6], data[7], data[8],
                                     data[9], data[10], data[11], data[12],
                                     data[13], data[14]]
-    print(merged_dict)
     return merged_dict
 
 
@@ -189,7 +188,7 @@ if __name__ == "__main__":
         # Change this between protein_to_score || transcript_to_score
         count = 1
         last = len(transcript_to_protein_to_score_sorted_by_score)
-        f.write("index,transcript,protein,probability,\n")
+        f.write("index,transcript,protein,probability\n")
         for triplet in transcript_to_protein_to_score_sorted_by_score:
             if count != last:
                 f.write("{},{},{},".format(count, triplet[0], triplet[1]))
