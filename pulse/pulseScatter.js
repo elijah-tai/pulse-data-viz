@@ -7,7 +7,6 @@ d3.chart.scatter = function() {
 	var data
 	var drawnData
 	var clickData = {
-		// isActive: false,
 		prevClicked: null
 	}
 	var objects
@@ -31,9 +30,10 @@ d3.chart.scatter = function() {
 		g = container
 
 		// Build box for chart
-		var	scatterRect = g.append("scatter-rect")
+		var	scatterRect = g.append("rect")
 			.attr("width", width)
 			.attr("height", height)
+			.classed("scatter-rect", true)
 
 		g.append("g")
 			.classed("x axis", true)
@@ -195,6 +195,7 @@ d3.chart.scatter = function() {
 			drawnData
 					.transition().duration(500)
 					.attr("r", 2)
+					.attr("fill", "rgb(0, 0, 0)")
 		}
 		// clicking on a different thing
 		else if (clickData.prevClicked !== d) {
@@ -205,6 +206,7 @@ d3.chart.scatter = function() {
 			drawnData
 					.filter(p => d["protein"] === p["protein"])
 					.transition().duration(750).attr("r", 3)
+					.attr("fill", "#FC880F")
 			clickData.prevClicked = null
 		}
 	}

@@ -3,7 +3,7 @@
     font-size: 11px;
 }
 
-scatter-rect {
+.scatter-rect {
   fill: transparent;
   shape-rendering: crispEdges;
 }
